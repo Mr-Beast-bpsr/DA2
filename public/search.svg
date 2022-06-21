@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="54" height="54" viewBox="0 0 54 54">
+  <g id="search" transform="translate(-908 -130)">
+    <circle id="Ellipse_2" data-name="Ellipse 2" cx="27" cy="27" r="27" transform="translate(908 130)" fill="#fbd10c"/>
+    <g id="Icon_feather-search" data-name="Icon feather-search" transform="translate(920.832 141.832)">
+      <path id="Path_1" data-name="Path 1" d="M22.576,13.538A9.038,9.038,0,1,1,13.538,4.5,9.038,9.038,0,0,1,22.576,13.538Z" fill="none" stroke="#162c77" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+      <path id="Path_2" data-name="Path 2" d="M29.889,29.889l-4.914-4.914" transform="translate(-5.054 -5.054)" fill="none" stroke="#162c77" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+    </g>
+  </g>
+</svg>
