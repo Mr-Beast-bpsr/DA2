@@ -140,8 +140,8 @@ const HomeMap = (props) => {
                   <a>
                     {uri.imageType ? (
                       <img
-                        src={videoImg.src}
-                        style={{ paddingTop: "65px", paddingBottom: "65px" }}
+                        src={uri.nftFeaturedImage|| videoImg.src}
+                        style={uri.nftFeaturedImage? {}: { paddingTop: "65px", paddingBottom: "65px" }}
                         className="card-img-top"
                         alt="..."
                       />

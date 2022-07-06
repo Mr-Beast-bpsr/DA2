@@ -66,7 +66,7 @@ const CreateNFT = () => {
   const account = useAccount();
   const { data, isError, isLoading, write } = useContractWrite(
     {
-      addressOrName: "0x001dB788405Ae02120704517d59A3161d8DE7111",
+      addressOrName: "0x1D1AbF49249AAacd61E0694a8197410272d3baA1",
       contractInterface: abi,
     },
     "mint",
@@ -96,10 +96,17 @@ const CreateNFT = () => {
       // console.log(token)
       console.log(data);
       let tokenId = parseInt(token.data);
-      if (data) {
+      if (data?.status == 1) {
         apiCall(tokenId);
+        console.log("api")
       }
-
+      if(data?.status == 0){
+        setErrorMessage(error?.message);
+        setErrorMessage("Transaction failed");
+        setTimeout(function () {
+          setModalShow(false);
+        }, 2000);
+      }
       if (error) {
         setErrorMessage(
           "An error has occurred please check etherscan for full details."
@@ -113,12 +120,13 @@ const CreateNFT = () => {
   });
   const token = useContractRead(
     {
-      addressOrName: "0x001dB788405Ae02120704517d59A3161d8DE7111",
+      addressOrName: "0x1D1AbF49249AAacd61E0694a8197410272d3baA1",
       contractInterface: abi,
     },
 
     "tokenIndex"
   );
+
   // console.log(ethers.utils.BigNumber.from(0x1b))
 
   function handleChange(index, event) {
@@ -175,7 +183,7 @@ const CreateNFT = () => {
     console.log(URL.createObjectURL(file));
   }
   async function UploadFile(file) {
-    e.preventDefault();
+    // e.preventDefault();
     console.log(file.type.split("/"));
     const client = create("https://ipfs.infura.io:5001/api/v0");
     const added = await client.add(file);
@@ -188,16 +196,32 @@ const CreateNFT = () => {
 
     if (file.size > 100000000) {
       alert("file can't be higher than 100mb");
-      setUploading(false);
+      setUploading2(false);
       return;
     }
     setUploading2(true);
     let url = await UploadFile(file);
-    setFileType(file.type.split("/"));
+    setFileType2(file.type.split("/"));
     setFileUrl2(url);
     setUploading2(false);
 
     // console.log(URL.createObjectURL(file));
+  }
+
+  async function onChange3(e) {
+    const file = e.target.files[0];
+    if (typeof file == "undefined") return;
+
+    if (file.size > 100000000) {
+      alert("file can't be higher than 100mb");
+      setUploadin3(false);
+      return;
+    }
+    setUploading3(true);
+    let url = await UploadFile(file);
+    setFileType3(file.type.split("/"));
+    setFileUrl3(url);
+    setUploading3(false);
   }
   function onSubmitHandler(e) {
     e.preventDefault();
@@ -212,7 +236,12 @@ const CreateNFT = () => {
     let supply = supplyRef.current?.value;
     setModalShow(true);
 
-    write({ args: [parseInt(supply)] });
+    write({
+      args: [account.data.address, parseInt(supply)],
+      overrides: {
+        gasLimit: 3302558,
+      },
+    });
   }
 
   async function apiCall(tokenId) {
@@ -231,6 +260,7 @@ const CreateNFT = () => {
       externalLink,
       fileUrl,
       fileUrl2,
+      fileUrl3,
       inputFields,
       fileType,
       freeCheck
@@ -248,10 +278,14 @@ const CreateNFT = () => {
       nftIndexName: name,
       nftDescription: description,
       nftImage: fileUrl,
+      nftFeaturedImage: fileUrl2,
+      nftSampleImage: fileUrl3,
+      freeForAll: freeCheck,
+
+      userAddress: account.data.address,
       imageType: type,
       totalSupply: supply,
       externalLink: externalLink,
-      userAddress: account.data.address,
       propertyArray: inputFields,
     };
     console.log(data);
@@ -383,7 +417,7 @@ const CreateNFT = () => {
                       style={{ display: "none" }}
                       id="contained-button-file2"
                       type="file"
-                      accept="image/*audio/*,video/*"
+                      accept="image/*"
                       onChange={onChange2}
                     />
                     <div
@@ -402,10 +436,10 @@ const CreateNFT = () => {
                           className="box-img"
                           type="jpg"
                         >
-                          {!setFileUrl2 ? (
+                          {!fileUrl2 ? (
                             <img src={ImgIcon.src} />
                           ) : fileUrl2 && fileType2[0] == "image" ? (
-                            <img width="100%" src={fileUrl} alt="img" />
+                            <img width="100%" src={fileUrl2} alt="img" />
                           ) : (
                             <ReactPlayer
                               playing
@@ -447,8 +481,7 @@ const CreateNFT = () => {
                       style={{ display: "none" }}
                       id="contained-button-file3"
                       type="file"
-                      accept="image/*"
-                      required
+                      accept="audio/*,video/*,image/*"
                       onChange={onChange3}
                     />
                     <div
@@ -705,7 +738,6 @@ const CreateNFT = () => {
                       className="form-ipt"
                       placeholder="1"
                       onChange={(e) => setFreeCheck(e.currentTarget.checked)}
-                      required
                     />
                   </div>
                   <div className="form-btn-sec">

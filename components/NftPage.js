@@ -1,32 +1,30 @@
 import React, { useEffect, useState } from "react";
 import ArrowLeft from "..//public/arrow-left.svg";
-import Like from "../public/like.png";
-import Heart from "../public/heart.svg";
+
 import EyeIcon from "../public/eye-icon.svg";
-import Hicon from "../public/h-icon.png";
-import ManIcon from "../public/man-pic.jpg";
-import { Accordion, Alert, Button } from "react-bootstrap";
+
+import { Accordion } from "react-bootstrap";
 import Link from "next/link";
 import ReactPlayer from "react-player/lazy";
-import $ from "jquery";
+
 import { useRouter } from "next/router";
 import axios from "axios";
-import AuctionTimer from "./ui/nftpage/AuctionTimer";
-import LoadingPlaceHolder from "./ui/nftpage/LoadingPlaceHolder";
 
 import { useAccount } from "wagmi";
 import { ToastContainer, toast } from 'react-toastify';
 
 
-const NftPage = ({ props }) => {
 
-  console.log(props);
+const NftPage = ({ props }) => {
+console.log(props)
+  const [inPlaylist,setInPlaylist] = useState(props.viewData.inPlaylist)
   const [loading,setLoading] =useState(true)
   const [heartActive, setHeartActive] = useState(props.viewData.fav);
   const [auction, setAuction] = useState(props.auctionData);
   const [nftContent, setNftContent] = useState(props.data.nftContent);
   const [nftTraits, setNftTraits] = useState(props.data.traits);
   const router = useRouter();
+
   const [activity, setActivity] = useState(null);
   const [sell, setSell] = useState(false);
   const [auctionEnd, setAuctionEnd] = useState(null);
@@ -38,6 +36,12 @@ const NftPage = ({ props }) => {
   const [ended, setEnded] = useState(null);
   const [endAuction, setEndAuction] = useState(null);
   const {data} = useAccount()
+  const [days, setDays] = useState(null);
+  const [hours, setHours] = useState(null);
+  const [minutes, setMinutes] = useState(null);
+  const [seconds, setSeconds] = useState(null);
+  const [distance, setDistance] = useState(2);
+
   function onBack() {
     router.back();
   }
@@ -65,9 +69,9 @@ const NftPage = ({ props }) => {
     setAddress(data?.address);
     console.log(data?.address.toLowerCase() == nftContent.nftOwner.toLowerCase())
 console.log( data , nftContent.nftOwner.toLowerCase())
-  
+if(new Date().getTime() > new Date(auction?.endDate)){setAuctionEnd(auction) ; setEnded(true);  }
     apiCall();
-  }, [data]);
+  }, []);
   function onPlaceBid() {}
   async function finalizeAuction(e) {
     e.preventDefault();
@@ -86,7 +90,7 @@ console.log( data , nftContent.nftOwner.toLowerCase())
   
        setTimeout(function () {
         setLoading(false);
-      }, 1000);
+      }, 3000);
     
   }
   useEffect(() => {
@@ -138,22 +142,24 @@ async function apiCall2(data) {
     if (heartActive ==false) {
       let add = await axios.post("/api/nftpage/fav/addfav", {
         tokenId: nftContent.id,
-        userAddress: address,
+        userAddress: data?.address,
       });
+    console.log(address)
+
     } else {
       console.log("remove")
 
       let remove = await axios.post("/api/nftpage/fav/removefav", {
         tokenId: nftContent.id,
-        userAddress: address,
+        userAddress: data?.address,
       });
     }
   }
 
 async function addToPlayList(e){
   e.preventDefault();
-  if(account.data?.address) {
-
+  if(data?.address) {
+console.log(nftContent.id)
     let add = await axios.post("/api/music/addtoplaylist", {
       id: nftContent.id,
       userAddress: address,
@@ -168,7 +174,7 @@ async function addToPlayList(e){
       draggable: true,
       progress: undefined,
       });
-  
+  setInPlaylist(true)
     return ;
   }
   toast.error('Please Connect wallet!', {
@@ -182,6 +188,91 @@ async function addToPlayList(e){
     });
 
 }
+
+async function removePlaylist(e){
+  e.preventDefault();
+  if(data?.address) {
+    setInPlaylist(false)
+
+    let add = await axios.post("/api/music/removeplaylist", {
+      id: nftContent.id,
+      userAddress: address,
+    });
+    console.log(add,"ad")
+    toast.success('Removed from playlist', {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      });
+    return ;
+  }''
+  console.log(address)
+  toast.error('Please Connect wallet!', {
+    position: "top-right",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    });
+
+}
+
+
+function notALoop(distance) {
+  // if (auction){
+  if (days <= 0 && hours <= 0 && minutes <= 0 && seconds <= 0) {
+    setEndAuction("Auction ended");
+    // return;
+  }
+
+  // const distance = datesec - dates;
+  // Time calculations for days, hours, minutes and seconds
+  setDays(Math.floor(distance / (1000 * 60 * 60 * 24)));
+  setHours(Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)));
+  setMinutes(Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)));
+  setSeconds(Math.floor((distance % (1000 * 60)) / 1000));
+
+  // console.log(days,hours,minutes,seconds)n
+}
+
+
+useEffect(() => {
+  if (auction != null) {
+    // console.log(auction)
+    // setEndAuction(auction[0].endDate)
+    let interval;
+    let date = new Date(auction.endDate).toDateString();
+    setEndAuction(date.toString());
+    let dates = new Date().getTime();
+    let datesec = new Date(auction.endDate).getTime();
+
+    let secs = datesec - dates;
+    if (distance <= 0) {
+      setEndAuction("Auction ended");
+    
+      setEnded(true);
+
+      return;
+    }
+
+    interval = setInterval(() => {
+      setDistance(secs - 1);
+    }, 1000);
+    // setDistance() ;
+    notALoop(distance);
+
+    // console.log(days,hours,minutes,seconds)
+  }
+
+  return () => clearInterval(interval);
+}, [auction, distance]);
+
   return (
     <div className="page-header">
       <ToastContainer
@@ -228,6 +319,7 @@ pauseOnHover
                     alt="..."
                   />
                 ) : (
+                  
                   <ReactPlayer
                     playing={true}
                     className="Da-Player"
@@ -240,105 +332,97 @@ pauseOnHover
                 )}
               </div>
             </div>
-            {loading ? (
-             <LoadingPlaceHolder/>
-            ) : (
-              <div className="col-md-6 right-part mt-4 pt-3">
+            <div className="col-md-6 right-part mt-4 pt-3">
            
-                <div className="heading-text">
-                  <h4 className="k-text">{nftContent.nftIndexName}</h4>
+           <div className="heading-text">
+             <h4 className="k-text">{nftContent.nftIndexName}</h4>
 
-                  <div onClick={heart} className={heartActive == true ? "heart is-active": "heart"}></div>
-                </div>
+             <div onClick={heart} className={heartActive == true ? "heart is-active": "heart"}></div>
+           </div>
 
-                <div className="collect-top">
-                  <div className="text-sec">
-                    {/* <h6 className="collect-text"> Collection Name</h6> */}
-                   {nftContent.imageType == 0 ? null : 
+           <div className="collect-top">
+             <div className="text-sec">
+               {/* <h6 className="collect-text"> Collection Name</h6> */}
+              {nftContent.imageType != 0 && !inPlaylist ? 
 
-<button onClick={addToPlayList} style={{width: '50%'}} className=" white-btn"> Add to playlist</button>
-                   }
-                    
-                    <p className="f-text">
-                      <img className="eye" src={EyeIcon.src} alt="..." />{" "}
-                      {props.viewData?.checkViews?.view || 0} views
-                    </p>
-                  </div>
-                  {auction !== null || auctionEnd != null ? (
-                    <AuctionTimer
-                      auction={auction}
-                      setAuction={setAuction}
-                      setAuctionEnd={setAuctionEnd}
-                      setEndAuction={setEndAuction}
-                      setEnded={setEnded}
-                      endAuction={endAuction}
-                    />
-                  ) : sell == true && auction == null && auctionEnd == null ? (
-                    <div
-                      style={{
-                        marginTop: "1rem",
-                        marginBottom: "2rem",
-                        marginLeft: "0",
-                      }}
-                    >
-                      <button onClick={onBid} className=" white-btn">
-                        Sell
-                      </button>
+<button onClick={addToPlayList} style={{width: '50%'}} className=" white-btn"> Add to playlist</button> : nftContent.imageType != 0 && inPlaylist ?  <button onClick={removePlaylist} style={{width: '50%'}} className=" white-btn"> Remove</button>  : null
+              }
+               
+               <p className="f-text">
+                 <img className="eye" src={EyeIcon.src} alt="..." />{" "}
+                 {props.viewData?.checkViews?.view || 0} views
+               </p>
+             </div>
+            
+             
+            <h5 className="heading-text">
+                        <strong>{props.finalPrice}</strong>{" "}
+                       
+                        {/* <span style={{ paddingLeft: "5px" }}> ETH</span>{" "} */}
+                      </h5>
                     </div>
-                  ) : (
-                    <h1
-                      className="collect-center"
-                      style={{
-                        width: "100%",
-                        // color: "red",
-                        textAlign: "center",
-                        padding: "15px",
-                        fontSize: "20px",
-                        marginTop: "70px",
-                      }}
-                    >
-                      {" "}
-                      Not For Sale{" "}
-                    </h1>
-                  )}
 
-                  <div className="bid-btn-sec">
-                    <div className="bid-text">
-                      {/* <h6 className="p-text">Price</h6> */}
-
-                      <h6
-                        style={{ justifyContent: "flex-start" }}
-                        className="heading-text"
-                      >
-                        {auction !== null &&
-                        activity !== null &&
-                        auction.auctionType === 2 &&
-                        activity.length >= 1 ? (
-                          <>
-                            {activity[0].amount}{" "}
-                            <span className="s-awax"> ETH</span>
-                          </>
-                        ) : auction !== null && auction.auctionType === 1 ? (
-                          <>
-                            {auction.minAmount}
-                            <span className="s-awax"> ETH</span>
-                          </>
-                        ) : auction !== null &&
-                          activity !== null &&
-                          auction.auctionType === 2 &&
-                          activity.length < 1 ? (
-                          <>
-                            {auction.minAmount}{" "}
-                            <span className="s-awax"> ETH</span>
-                          </>
-                        ) : (
-                          ""
-                        )}
-                      </h6>
-                      {auction !== null &&
-                      auction.auctionType === 1 &&
-                      !sell ? (
-                        <button
+                    <div className="bid-btn">
+                      
+                  {auction ? 
+                  
+                  <div className="collect-center">
+                  <div className="ends">
+                    <h6 className="act-text">  { !ended && auction.auctionType == 1
+                                          ? !ended ?  "Sale   ends on"
+                                          : "Auction ends on" : ''}{" "}
+                                      {" :"}        {!ended ? new Date( auction.endDate).toDateString() : "Auction ended"} </h6> <span style={{ fontSize: "1.4rem" }}> 
+                                 
+                                      </span>
+                  </div>
+                  <div className="num-title">
+                    <div className="num-text">
+                      <h2>{days} </h2>
+                      <h5>Days</h5>
+                    </div>
+                    <div className="sem">
+                      <h2>:</h2>
+                    </div>
+            
+                    <div className="num-text">
+                      <h2>{hours} </h2>
+                      <h5>Hours</h5>
+                    </div>
+                    <div className="sem">
+                      <h2>:</h2>
+                    </div>
+            
+                    <div className="num-text">
+                      <h2>{minutes}</h2>
+                      <h5>Mins</h5>
+                    </div>
+            
+                    <div className="sem">
+                      <h2>:</h2>
+                    </div>
+            
+                    <div className="num-text">
+                      <h2>{seconds}</h2>
+                      <h5>Seconds</h5>
+                    </div>
+                  </div>
+                </div>
+                //   <AuctionTimer
+                //   auction={auction}
+                //   setAuction={setAuction}
+                //   setAuctionEnd={setAuctionEnd}
+                //   setEndAuction={setEndAuction}
+                //   setEnded={setEnded}
+                //   endAuction={endAuction}
+                // /> 
+                  
+                  : null}
+                  
+                  
+                  
+                  
+               { !ended &&  auction?.auctionType == 1 && !sell ?
+                  <button  
                           onClick={publicSaleHandler}
                           className="btn   white-btn"
                           role="button"
@@ -347,264 +431,60 @@ pauseOnHover
                         >
                           Buy
                         </button>
-                      ) : auction != null &&
-                        sell == true &&
-                        auction.auctionType == 1 ? (
-                        <button
-                          style={{ width: "100%" }}
-                          className="btn white-btn"
-                          onClick={() =>
-                            stopSales(
-                              dataa.nftContent.nftIndex,
-                              props.id,
-                              setTransHash,
-                              setCloseModals,
-                              auction.id,
-                              setSuccess,
-                              collectionAddress
-                            )
-                          }
-                        >
-                          Cancel Sale
-                        </button>
-                      ) : null}
-
-                      {auction !== null &&
-                      auction.auctionType == "2" &&
-                      !sell ? (
-                        <button
-                          onClick={onPlaceBid}
-                          type="button"
-                          className="btn btn-light white-btn"
-                        >
-                          Place bid
-                        </button>
-                      ) : auction !== null &&
-                        sell === true &&
-                        auction.auctionType === 2 ? (
-                        <>
-                          <button
-                            className="btn white-btn"
-                            style={{ width: "33%" }}
-                            onClick={() =>
-                              cancelAuctions(
-                                dataa.nftContent.nftIndex,
-
-                                props.id,
-                                setTransHash,
-                                setCloseModals,
-                                auction.id,
-                                setSuccess
-                              )
-                            }
-                          >
-                            Cancel Auction
-                          </button>
-                          <button
-                            style={{ width: "33%" }}
-                            className="btn btn-light white-btn"
-                            onClick={finalizeAuction}
-                          >
-                            Finalize Auction
-                          </button>
-                        </>
-                      ) : null}
-                    </div>
-
-                    {auctionEnd != null && sell == true &&
-                        auctionEnd?.auctionType == 1 
-                 ? (
-                      <button
+                        : auction?.auctionType == 1 && sell && ended ?  <button
+                        type="button"
                         className="btn white-btn"
-                        onClick={() =>
-                          stopSales(
-                            dataa.nftContent.nftIndex,
-
-                            props.id,
-                            setTransHash,
-                            setCloseModals,
-                            auctionEnd.id,
-                            setSuccess,
-                            collectionAddress
-                          )
-                        }
+                  
                       >
-                        Cancel Sale
-                      </button>
-                    ) : null}
-
-                    {auctionEnd !== null &&
-                    auctionEnd.auctionType === 2 &&
-                    sell === true ? (
-                      <>
-                        <button
-                          className="btn white-btn"
-                          onClick={() =>
-                            cancelAuctions(
-                              dataa.nftContent.nftIndex,
-
-                              props.id,
-                              setTransHash,
-                              setCloseModals,
-                              auctionEnd.id,
-                              setSuccess
-                            )
-                          }
-                        >
-                          Cancel Auction
-                        </button>
-                        <button
-                          className="btn btn-light white-btn"
-                          onClick={(e) =>
-                            finalize(
-                              dataa.nftContent.nftIndex,
-
-                              props.id,
-                              setTransHash,
-                              setCloseModals,
-                              auctionEnd.id,
-                              setSuccess,
-                              collectionAddress
-                            )
-                          }
-                        >
-                          Finalize Auction
-                        </button>
-                      </>
-                    ) : null}
-                    {claim ? (
-                      <button
-                        style={{
-                          position: "relative",
-                          // left: "-68%",
-                          marginTop: "70px",
-                          height: "60px",
-                        }}
-                        onClick={() =>
-                          claimRewards(
-                            dataa.nftContent.nftIndex,
-                            props.id,
-                            setTransHash,
-                            setCloseModals,
-
-                            setSuccess,
-                            collectionAddress
-                          )
-                        }
-                        className="btn btn-light white-btn"
-                      >
-                        Claim
-                      </button>
-                    ) : null}
-                    {cancelClaimButton === true ? (
-                      <button
-                        style={{
-                          position: "relative",
-                          // left: "-68%",
-                          marginTop: "70px",
-                          height: "60px",
-                        }}
-                        onClick={() =>
-                          cancelClaimFunction(
-                            dataa.nftContent.nftIndex,
-                            props.id,
-                            setTransHash,
-                            setCloseModals,
-
-                            setSuccess,
-                            collectionAddress
-                          )
-                        }
-                        className="btn btn-light white-btn"
-                      >
-                        Cancel Claim
-                      </button>
-                    ) : null}
-                    <Alert show={error} variant="success">
-                      Switch to ETH Mainnet.
-                      <Alert.Heading> </Alert.Heading>
-                      <div className="d-flex justify-content-end">
-                        <Button
-                          onClick={() => setError(false)}
-                          variant="outline-success"
-                        >
-                          Got it!
-                        </Button>
-                      </div>
-                    </Alert>
-                  </div>
-                  {/* <VerticalModal
-                    id={props.id}
-                    show={modalShow}
-                    onHide={() => setModalShow(false)}
-                  />
-                  <BidHandler
-                    auctionid={auction !== null ? auction.id : null}
-                    id={props.id}
-                    tokenindex={dataa.nftContent.nftIndex}
-                    show={bidModalShow}
-                    minAmount={
-                      auction !== null &&
-                      activity !== null &&
-                      auction.auctionType === 2 &&
-                      activity.length >= 1
-                        ? activity[0].amount + " Avax"
-                        : auction !== null && auction.auctionType === 1
-                        ? auction.minAmount + " Avax"
-                        : auction !== null &&
-                          activity !== null &&
-                          auction.auctionType === 2 &&
-                          activity.length < 1
-                        ? auction.minAmount + " Avax"
-                        : ""
-                    }
-                    // minAmount={auction !== null ? auction.minAmount : null}
-                    onHide={() => {
-                      setBidModalShow(false);
-                      setTimeout(() => {
-                        getBidsOnAuction(
-                          auction.id,
-                          dataa.nftContent.nftIndex,
-                          setActivity
-                        );
-                      }, 2000);
-                    }}
-                    // auctionI={auction !== null ? auction.id : null}
-                    propId={props.id}
-                    setActivity={setActivity}
-                  /> */}
-                </div>
-              </div>
-            )}
-
-            {/* <h5 className="heading-text">
-                        <strong>{props.finalPrice}</strong>{" "}
-                        <span style={{ paddingLeft: "5px" }}> ETH</span>{" "}
-                      </h5>
-                    </div>
-
-                    <div className="bid-btn">
-                      <a
-                        href="#"
-                        className="btn rounded-pill  blue-btn"
-                        role="button"
-                        data-bs-toggle="button"
-                        aria-pressed="true"
-                      >
-                        Buy
-                      </a>
+                    Cancel Sale
+                      </button> : auction?.auctionType == 2 && !sell && !ended ?
                       <button
                         type="button"
                         className="btn white-btn"
-                        data-bs-toggle="modal"
-                        data-bs-target="#exampleModal"
+                        onClick={onBid}
                       >
-                        Place bid
+                        Bid
                       </button>
+                      : auction?.auctionType == 2 && sell && ended?
+                     
+                     <>
+                      <button
+
+type="button"
+className="btn white-btn"
+onClick={onBid}
+>
+                        Cancel Auction
+                      </button>
+                      <button
+
+type="button"
+className="btn white-btn"
+onClick={onBid}
+>
+                        Finalize
+                      </button>
+                        </>
+                      : null
+                    }
+
+                    {
+!auction  && sell?    <button  
+onClick={onBid}
+className="btn   white-btn"
+role="button"
+data-bs-toggle="button"
+aria-pressed="true"
+>
+Sell
+</button> :null
+                    }
+                      
                     </div>
                   </div>
-                </div>
-              </div> */}
+                
+
+      
             <section className="activity-part">
               <div className="col-md-6 left-activity ">
                 <div className="top-content">
@@ -691,20 +571,22 @@ pauseOnHover
             <div className="accordion-body"> */}
 
                       <Accordion.Body className="accordion-body">
-                        <div className="left-acd">
+                        <div className="">
                           <p>Contract Address</p>
                           <p> Token ID</p>
                           <p>Token Standard</p>
                           <p> Blockchain</p>
+                          <p>Supply</p>
                         </div>
-                        <div className="right-acd">
+                        <div className="">
                           <p className="acd-text text-break ">
                             {" "}
                             {nftContent?.nftOwner}{" "}
                           </p>
                           <p>{nftContent.nftIndex}</p>
                           <p> ERC-1155</p>
-                          <p>Ethereum</p>
+                          <p>Polygon</p>
+                          <p>{nftContent.totalSupply}</p>
                         </div>
                         {/* </div>
           
@@ -780,9 +662,7 @@ pauseOnHover
                       </Accordion.Body>
                     </Accordion.Item>
                   </Accordion>
-                  {/*   
-        </div>
-      </div> */}
+         
                 </div>
               </div>
             </section>

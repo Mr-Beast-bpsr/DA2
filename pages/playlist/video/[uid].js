@@ -20,7 +20,7 @@ console.log(datafirst.data.data)
 let data = datafirst.data.data
 let arr =[ ]
 data.map(item=>{
-  if(item.imageType== 1){
+  if(item.imageType== 1 || 2){
     arr.push(item)
   }
 })

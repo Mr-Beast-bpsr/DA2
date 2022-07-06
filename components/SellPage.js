@@ -278,7 +278,7 @@ const SellPage = ({ id }) => {
                         className="price-font"
                         style={{ marginLeft: "12px" }}
                       >
-                        ETH
+                        Poly
                       </div>
                       <div></div>
                     </div>

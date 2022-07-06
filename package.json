@@ -35,9 +35,11 @@
     "react-copy-to-clipboard": "^5.1.0",
     "react-dom": "18.1.0",
     "react-h5-audio-player": "^3.8.4",
+    "react-media-player": "^0.7.9",
     "react-player": "^2.10.1",
     "react-toastify": "^9.0.4",
     "reactjs-video-playlist-player": "^1.1.1",
+    "video-react": "^0.15.0",
     "wagmi": "^0.4.12",
     "web3": "^1.7.3"
   },

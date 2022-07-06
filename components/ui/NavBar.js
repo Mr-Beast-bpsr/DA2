@@ -148,7 +148,7 @@ const NavBar = () => {
            <li className="nav-item dropdown">
 
 
-           <Dropdown>
+           {/* <Dropdown>
 
 <Dropdown.Toggle variant="success" className={router.pathname=='/playlist/sound'|| router.pathname=='/playlist/video' ?"nav-link dropdown-toggle active " :"nav-link dropdown-toggle "} id="dropdown-basic navbarDropdown">
 Playlist
@@ -173,6 +173,12 @@ Playlist
 </Dropdown.Menu>
 </Dropdown>
 
+     */}
+{ data?.address  && <li className="nav-item">
+              <Link href={"/playlist/"+ data?.address}>
+              <a className={router.pathname=='/assets/[uid]' ?"nav-link active " :"nav-link "} >Playlist</a>
+              </Link>
+            </li>}
 
 
 

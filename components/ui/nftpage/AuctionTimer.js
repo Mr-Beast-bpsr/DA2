@@ -7,11 +7,6 @@ const AuctionTimer = ({
   setEnded,
   setEndAuction,endAuction
 }) => {
-  const [days, setDays] = useState(null);
-  const [hours, setHours] = useState(null);
-  const [minutes, setMinutes] = useState(null);
-  const [seconds, setSeconds] = useState(null);
-  const [distance, setDistance] = useState(2);
 
   useEffect(() => {
     if (auction != null) {

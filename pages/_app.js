@@ -4,6 +4,7 @@ import $ from 'jquery'
 import 'react-toastify/dist/ReactToastify.css';
 // import '@madzadev/audio-player/dist/index.css'
 import '@rainbow-me/rainbowkit/styles.css';
+import 'video-react/dist/video-react.css'; // import css
 import {
   getDefaultWallets,
   RainbowKitProvider,
@@ -31,9 +32,9 @@ function MyApp({ Component, pageProps }) {
 // import { alchemyProvider } from 'wagmi/providers/alchemy';
 // import { publicProvider } from 'wagmi/providers/public';
 const { chains, provider } = configureChains(
-  [ chain.rinkeby],
+  [ chain.polygonMumbai],
   [
-    infuraProvider({ infuraId:"b4e2f0e57620408ebd82740df745f1a4" }),
+    // infuraProvider({ infuraId:"b4e2f0e57620408ebd82740df745f1a4" }),
     publicProvider()
   ]
 );

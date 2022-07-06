@@ -156,17 +156,11 @@ const NftPage = ({ props }) => {
                                 <img
                                   src={
                                     item.imageType
-                                      ? videoImg.src
+                                      ? item.nftFeaturedImage
                                       : item.nftImage
                                   }
-                                  style={
-                                    item.imageType
-                                      ? {
-                                          paddingTop: "90px",
-                                          paddingBottom: "90px",
-                                        }
-                                      : { padding: "" }
-                                  }
+                                  
+                                  style={item.nftFeaturedImage? {}: { paddingTop: "65px", paddingBottom: "65px" }}
                                   className="card-img-top"
                                   alt="..."
                                 />

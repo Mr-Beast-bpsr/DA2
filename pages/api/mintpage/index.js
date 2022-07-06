@@ -7,9 +7,13 @@ export default async function handler(req, res) {
 
       console.log(data);
       let datafirst = await axios.post(
-        "http://52.9.60.249:4000/api/v1/nft/mintnft",data
+        "http://52.9.60.249:4000/api/v1/nft/mintnft",
+        data
       );
 
+      // let datafirst = await axios.post(
+      //   "http://52.9.60.249:4000/api/v1/nft/mintnft",data
+      // );
 
       console.log(datafirst.data.data);
       res.status(200).json({ data: datafirst.data.data });
