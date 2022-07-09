@@ -11,14 +11,12 @@ import { useRouter } from "next/router";
 import axios from "axios";
 
 import { useAccount } from "wagmi";
-import { ToastContainer, toast } from 'react-toastify';
-
-
+import { ToastContainer, toast } from "react-toastify";
 
 const NftPage = ({ props }) => {
-console.log(props)
-  const [inPlaylist,setInPlaylist] = useState(props.viewData.inPlaylist)
-  const [loading,setLoading] =useState(true)
+  console.log(props);
+  const [inPlaylist, setInPlaylist] = useState(props.viewData.inPlaylist);
+  const [loading, setLoading] = useState(true);
   const [heartActive, setHeartActive] = useState(props.viewData.fav);
   const [auction, setAuction] = useState(props.auctionData);
   const [nftContent, setNftContent] = useState(props.data.nftContent);
@@ -35,7 +33,7 @@ console.log(props)
   const [address, setAddress] = useState(null);
   const [ended, setEnded] = useState(null);
   const [endAuction, setEndAuction] = useState(null);
-  const {data} = useAccount()
+  const { data } = useAccount();
   const [days, setDays] = useState(null);
   const [hours, setHours] = useState(null);
   const [minutes, setMinutes] = useState(null);
@@ -64,12 +62,17 @@ console.log(props)
   useEffect(() => {}, []);
 
   useEffect(() => {
-   let owner=  localStorage.getItem("address")
-    setSell(data?.address.toLowerCase() == nftContent.nftOwner.toLowerCase())
+    let owner = localStorage.getItem("address");
+    setSell(data?.address.toLowerCase() == nftContent.nftOwner.toLowerCase());
     setAddress(data?.address);
-    console.log(data?.address.toLowerCase() == nftContent.nftOwner.toLowerCase())
-console.log( data , nftContent.nftOwner.toLowerCase())
-if(new Date().getTime() > new Date(auction?.endDate)){setAuctionEnd(auction) ; setEnded(true);  }
+    console.log(
+      data?.address.toLowerCase() == nftContent.nftOwner.toLowerCase()
+    );
+    console.log(data, nftContent.nftOwner.toLowerCase());
+    if (new Date().getTime() > new Date(auction?.endDate)) {
+      setAuctionEnd(auction);
+      setEnded(true);
+    }
     apiCall();
   }, []);
   function onPlaceBid() {}
@@ -87,42 +90,39 @@ if(new Date().getTime() > new Date(auction?.endDate)){setAuctionEnd(auction) ; s
     );
   }
   async function apiCall() {
-  
-       setTimeout(function () {
-        setLoading(false);
-      }, 3000);
-    
+    setTimeout(function () {
+      setLoading(false);
+    }, 3000);
   }
   useEffect(() => {
-    apiCall2(auction)
+    apiCall2(auction);
+  }, [auction]);
+  async function apiCall2(data) {
+    if (data == null) return;
+    let checkUser = {
+      userAddress: address,
+      auctionId: data.id,
+      tokenId: nftContent.nftIndex,
+    };
+    // console.log(det)
+    const response1 = await axios.post(
+      "/api/nftpage/auction/checkuser",
+      checkUser
+    );
 
-  },[auction])
-async function apiCall2(data) {
-  if (data == null) return;
-  let checkUser = {
-    userAddress: address,
-    auctionId: data.id,
-    tokenId: nftContent.nftIndex,
-  };
-  // console.log(det)
-  const response1 = await axios.post(
-    "/api/nftpage/auction/checkuser",
-    checkUser
-  );
+    const data1 = await response1.data;
+    console.log(data1.data);
+    console.log(data1, "data");
+    const response2 = await axios.post("/api/nftpage/auction/getbids", {
+      auctionId: data.id,
+    });
 
-  const data1 = await response1.data;
-  console.log(data1.data);
-  console.log(data1, "data");
-  const response2 = await axios.post("/api/nftpage/auction/getbids", {
-    auctionId: data.id,
-  });
-
-  const data2 = await response2.data.data;
-  console.log(data2, "Data!");
-  setActivity(data2);
-  console.log(data2.data);
-  console.log();
-}
+    const data2 = await response2.data.data;
+    console.log(data2, "Data!");
+    setActivity(data2);
+    console.log(data2.data);
+    console.log();
+  }
   ////////////////////////////////////////////////
 
   ////////////////////////////////////////////////////////////
@@ -131,23 +131,17 @@ async function apiCall2(data) {
     router.push("/sellpage/" + props.id);
   }
 
-
-  
-
-
-
   async function heart() {
     setHeartActive(!heartActive);
 
-    if (heartActive ==false) {
+    if (heartActive == false) {
       let add = await axios.post("/api/nftpage/fav/addfav", {
         tokenId: nftContent.id,
         userAddress: data?.address,
       });
-    console.log(address)
-
+      console.log(address);
     } else {
-      console.log("remove")
+      console.log("remove");
 
       let remove = await axios.post("/api/nftpage/fav/removefav", {
         tokenId: nftContent.id,
@@ -156,136 +150,133 @@ async function apiCall2(data) {
     }
   }
 
-async function addToPlayList(e){
-  e.preventDefault();
-  if(data?.address) {
-console.log(nftContent.id)
-    let add = await axios.post("/api/music/addtoplaylist", {
-      id: nftContent.id,
-      userAddress: address,
-    });
-    console.log("ad")
-    toast.success('Added to playlist', {
-      position: "top-right",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
+  async function addToPlayList(e) {
+    e.preventDefault();
+    if (data?.address) {
+      console.log(nftContent.id);
+      let add = await axios.post("/api/music/addtoplaylist", {
+        id: nftContent.id,
+        userAddress: address,
       });
-  setInPlaylist(true)
-    return ;
-  }
-  toast.error('Please Connect wallet!', {
-    position: "top-right",
-    autoClose: 5000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-    progress: undefined,
-    });
-
-}
-
-async function removePlaylist(e){
-  e.preventDefault();
-  if(data?.address) {
-    setInPlaylist(false)
-
-    let add = await axios.post("/api/music/removeplaylist", {
-      id: nftContent.id,
-      userAddress: address,
-    });
-    console.log(add,"ad")
-    toast.success('Removed from playlist', {
-      position: "top-right",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
+      console.log("ad");
+      toast.success("Added to playlist", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
       });
-    return ;
-  }''
-  console.log(address)
-  toast.error('Please Connect wallet!', {
-    position: "top-right",
-    autoClose: 5000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-    progress: undefined,
-    });
-
-}
-
-
-function notALoop(distance) {
-  // if (auction){
-  if (days <= 0 && hours <= 0 && minutes <= 0 && seconds <= 0) {
-    setEndAuction("Auction ended");
-    // return;
-  }
-
-  // const distance = datesec - dates;
-  // Time calculations for days, hours, minutes and seconds
-  setDays(Math.floor(distance / (1000 * 60 * 60 * 24)));
-  setHours(Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)));
-  setMinutes(Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)));
-  setSeconds(Math.floor((distance % (1000 * 60)) / 1000));
-
-  // console.log(days,hours,minutes,seconds)n
-}
-
-
-useEffect(() => {
-  if (auction != null) {
-    // console.log(auction)
-    // setEndAuction(auction[0].endDate)
-    let interval;
-    let date = new Date(auction.endDate).toDateString();
-    setEndAuction(date.toString());
-    let dates = new Date().getTime();
-    let datesec = new Date(auction.endDate).getTime();
-
-    let secs = datesec - dates;
-    if (distance <= 0) {
-      setEndAuction("Auction ended");
-    
-      setEnded(true);
-
+      setInPlaylist(true);
       return;
     }
-
-    interval = setInterval(() => {
-      setDistance(secs - 1);
-    }, 1000);
-    // setDistance() ;
-    notALoop(distance);
-
-    // console.log(days,hours,minutes,seconds)
+    toast.error("Please Connect wallet!", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
   }
 
-  return () => clearInterval(interval);
-}, [auction, distance]);
+  async function removePlaylist(e) {
+    e.preventDefault();
+    if (data?.address) {
+      setInPlaylist(false);
+
+      let add = await axios.post("/api/music/removeplaylist", {
+        id: nftContent.id,
+        userAddress: address,
+      });
+      console.log(add, "ad");
+      toast.success("Removed from playlist", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      return;
+    }
+    ("");
+    console.log(address);
+    toast.error("Please Connect wallet!", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  }
+
+  function notALoop(distance) {
+    // if (auction){
+    if (days <= 0 && hours <= 0 && minutes <= 0 && seconds <= 0) {
+      setEndAuction("Auction ended");
+      // return;
+    }
+
+    // const distance = datesec - dates;
+    // Time calculations for days, hours, minutes and seconds
+    setDays(Math.floor(distance / (1000 * 60 * 60 * 24)));
+    setHours(Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)));
+    setMinutes(Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)));
+    setSeconds(Math.floor((distance % (1000 * 60)) / 1000));
+
+    // console.log(days,hours,minutes,seconds)n
+  }
+
+  useEffect(() => {
+    if (auction != null) {
+      // console.log(auction)
+      // setEndAuction(auction[0].endDate)
+      let interval;
+      let date = new Date(auction.endDate).toDateString();
+      setEndAuction(date.toString());
+      let dates = new Date().getTime();
+      let datesec = new Date(auction.endDate).getTime();
+
+      let secs = datesec - dates;
+      if (distance <= 0) {
+        setEndAuction("Auction ended");
+
+        setEnded(true);
+
+        return;
+      }
+
+      interval = setInterval(() => {
+        setDistance(secs - 1);
+      }, 1000);
+      // setDistance() ;
+      notALoop(distance);
+
+      // console.log(days,hours,minutes,seconds)
+    }
+
+    return () => clearInterval(interval);
+  }, [auction, distance]);
 
   return (
     <div className="page-header">
       <ToastContainer
-position="top-right"
-autoClose={5000}
-hideProgressBar={false}
-newestOnTop={false}
-closeOnClick
-rtl={false}
-pauseOnFocusLoss
-draggable
-pauseOnHover
-/>
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       <section className="page-head">
         <div className="container">
           <div className="row">
@@ -319,8 +310,8 @@ pauseOnHover
                     alt="..."
                   />
                 ) : (
-                  
                   <ReactPlayer
+                    playsInline
                     playing={true}
                     className="Da-Player"
                     url={nftContent.nftImage}
@@ -333,158 +324,166 @@ pauseOnHover
               </div>
             </div>
             <div className="col-md-6 right-part mt-4 pt-3">
-           
-           <div className="heading-text">
-             <h4 className="k-text">{nftContent.nftIndexName}</h4>
+              <div className="heading-text">
+                <h4 className="k-text">{nftContent.nftIndexName}</h4>
 
-             <div onClick={heart} className={heartActive == true ? "heart is-active": "heart"}></div>
-           </div>
+                <div
+                  onClick={heart}
+                  className={heartActive == true ? "heart is-active" : "heart"}
+                ></div>
+              </div>
 
-           <div className="collect-top">
-             <div className="text-sec">
-               {/* <h6 className="collect-text"> Collection Name</h6> */}
-              {nftContent.imageType != 0 && !inPlaylist ? 
+              <div className="collect-top">
+                <div className="text-sec">
+                  {/* <h6 className="collect-text"> Collection Name</h6> */}
+                  {nftContent.imageType != 0 && !inPlaylist ? (
+                    <button
+                      onClick={addToPlayList}
+                      style={{ width: "50%" }}
+                      className=" white-btn"
+                    >
+                      {" "}
+                      Add to playlist
+                    </button>
+                  ) : nftContent.imageType != 0 && inPlaylist ? (
+                    <button
+                      onClick={removePlaylist}
+                      style={{ width: "50%" }}
+                      className=" white-btn"
+                    >
+                      {" "}
+                      Remove
+                    </button>
+                  ) : null}
 
-<button onClick={addToPlayList} style={{width: '50%'}} className=" white-btn"> Add to playlist</button> : nftContent.imageType != 0 && inPlaylist ?  <button onClick={removePlaylist} style={{width: '50%'}} className=" white-btn"> Remove</button>  : null
-              }
-               
-               <p className="f-text">
-                 <img className="eye" src={EyeIcon.src} alt="..." />{" "}
-                 {props.viewData?.checkViews?.view || 0} views
-               </p>
-             </div>
-            
-             
-            <h5 className="heading-text">
-                        <strong>{props.finalPrice}</strong>{" "}
-                       
-                        {/* <span style={{ paddingLeft: "5px" }}> ETH</span>{" "} */}
-                      </h5>
-                    </div>
-
-                    <div className="bid-btn">
-                      
-                  {auction ? 
-                  
-                  <div className="collect-center">
-                  <div className="ends">
-                    <h6 className="act-text">  { !ended && auction.auctionType == 1
-                                          ? !ended ?  "Sale   ends on"
-                                          : "Auction ends on" : ''}{" "}
-                                      {" :"}        {!ended ? new Date( auction.endDate).toDateString() : "Auction ended"} </h6> <span style={{ fontSize: "1.4rem" }}> 
-                                 
-                                      </span>
-                  </div>
-                  <div className="num-title">
-                    <div className="num-text">
-                      <h2>{days} </h2>
-                      <h5>Days</h5>
-                    </div>
-                    <div className="sem">
-                      <h2>:</h2>
-                    </div>
-            
-                    <div className="num-text">
-                      <h2>{hours} </h2>
-                      <h5>Hours</h5>
-                    </div>
-                    <div className="sem">
-                      <h2>:</h2>
-                    </div>
-            
-                    <div className="num-text">
-                      <h2>{minutes}</h2>
-                      <h5>Mins</h5>
-                    </div>
-            
-                    <div className="sem">
-                      <h2>:</h2>
-                    </div>
-            
-                    <div className="num-text">
-                      <h2>{seconds}</h2>
-                      <h5>Seconds</h5>
-                    </div>
-                  </div>
+                  <p className="f-text">
+                    <img className="eye" src={EyeIcon.src} alt="..." />{" "}
+                    {props.viewData?.checkViews?.view || 0} views
+                  </p>
                 </div>
-                //   <AuctionTimer
+
+                <h5 className="heading-text">
+                  <strong>{props.finalPrice}</strong>{" "}
+                  {/* <span style={{ paddingLeft: "5px" }}> ETH</span>{" "} */}
+                </h5>
+              </div>
+
+              <div className="bid-btn">
+                {auction ? (
+                  <div className="collect-center">
+                    <div className="ends">
+                      <h6 className="act-text">
+                        {" "}
+                        {!ended && auction.auctionType == 1
+                          ? !ended
+                            ? "Sale   ends on"
+                            : "Auction ends on"
+                          : ""}{" "}
+                        {" :"}{" "}
+                        {!ended
+                          ? new Date(auction.endDate).toDateString()
+                          : "Auction ended"}{" "}
+                      </h6>{" "}
+                      <span style={{ fontSize: "1.4rem" }}></span>
+                    </div>
+                    <div className="num-title">
+                      <div className="num-text">
+                        <h2>{days} </h2>
+                        <h5>Days</h5>
+                      </div>
+                      <div className="sem">
+                        <h2>:</h2>
+                      </div>
+
+                      <div className="num-text">
+                        <h2>{hours} </h2>
+                        <h5>Hours</h5>
+                      </div>
+                      <div className="sem">
+                        <h2>:</h2>
+                      </div>
+
+                      <div className="num-text">
+                        <h2>{minutes}</h2>
+                        <h5>Mins</h5>
+                      </div>
+
+                      <div className="sem">
+                        <h2>:</h2>
+                      </div>
+
+                      <div className="num-text">
+                        <h2>{seconds}</h2>
+                        <h5>Seconds</h5>
+                      </div>
+                    </div>
+                  </div>
+                ) : //   <AuctionTimer
                 //   auction={auction}
                 //   setAuction={setAuction}
                 //   setAuctionEnd={setAuctionEnd}
                 //   setEndAuction={setEndAuction}
                 //   setEnded={setEnded}
                 //   endAuction={endAuction}
-                // /> 
-                  
-                  : null}
-                  
-                  
-                  
-                  
-               { !ended &&  auction?.auctionType == 1 && !sell ?
-                  <button  
-                          onClick={publicSaleHandler}
-                          className="btn   white-btn"
-                          role="button"
-                          data-bs-toggle="button"
-                          aria-pressed="true"
-                        >
-                          Buy
-                        </button>
-                        : auction?.auctionType == 1 && sell && ended ?  <button
-                        type="button"
-                        className="btn white-btn"
-                  
-                      >
+                // />
+
+                null}
+
+                {!ended && auction?.auctionType == 1 && !sell ? (
+                  <button
+                    onClick={publicSaleHandler}
+                    className="btn   white-btn"
+                    role="button"
+                    data-bs-toggle="button"
+                    aria-pressed="true"
+                  >
+                    Buy
+                  </button>
+                ) : auction?.auctionType == 1 && sell && ended ? (
+                  <button type="button" className="btn white-btn">
                     Cancel Sale
-                      </button> : auction?.auctionType == 2 && !sell && !ended ?
-                      <button
-                        type="button"
-                        className="btn white-btn"
-                        onClick={onBid}
-                      >
-                        Bid
-                      </button>
-                      : auction?.auctionType == 2 && sell && ended?
-                     
-                     <>
-                      <button
+                  </button>
+                ) : auction?.auctionType == 2 && !sell && !ended ? (
+                  <button
+                    type="button"
+                    className="btn white-btn"
+                    onClick={onBid}
+                  >
+                    Bid
+                  </button>
+                ) : auction?.auctionType == 2 && sell && ended ? (
+                  <>
+                    <button
+                      type="button"
+                      className="btn white-btn"
+                      onClick={onBid}
+                    >
+                      Cancel Auction
+                    </button>
+                    <button
+                      type="button"
+                      className="btn white-btn"
+                      onClick={onBid}
+                    >
+                      Finalize
+                    </button>
+                  </>
+                ) : null}
 
-type="button"
-className="btn white-btn"
-onClick={onBid}
->
-                        Cancel Auction
-                      </button>
-                      <button
+                {!auction && sell ? (
+                  <button
+                    onClick={onBid}
+                    className="btn   white-btn"
+                    role="button"
+                    data-bs-toggle="button"
+                    aria-pressed="true"
+                  >
+                    Sell
+                  </button>
+                ) : null}
+              </div>
+            </div>
 
-type="button"
-className="btn white-btn"
-onClick={onBid}
->
-                        Finalize
-                      </button>
-                        </>
-                      : null
-                    }
-
-                    {
-!auction  && sell?    <button  
-onClick={onBid}
-className="btn   white-btn"
-role="button"
-data-bs-toggle="button"
-aria-pressed="true"
->
-Sell
-</button> :null
-                    }
-                      
-                    </div>
-                  </div>
-                
-
-      
             <section className="activity-part">
               <div className="col-md-6 left-activity ">
                 <div className="top-content">
@@ -662,7 +661,6 @@ Sell
                       </Accordion.Body>
                     </Accordion.Item>
                   </Accordion>
-         
                 </div>
               </div>
             </section>
