@@ -40,7 +40,7 @@
     "react-toastify": "^9.0.4",
     "reactjs-video-playlist-player": "^1.1.1",
     "video-react": "^0.15.0",
-    "wagmi": "^0.4.12",
+    "wagmi": "^0.5.9",
     "web3": "^1.7.3"
   },
   "devDependencies": {
