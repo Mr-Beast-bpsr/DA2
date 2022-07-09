@@ -217,7 +217,7 @@ Playlist
             
               if (!mounted || !account || !chain) {
                 return (
-                  <button className="btn wallet-btn" onClick={openConnectModal} type="button">
+                  <button className="btn wallet-btn" style={{width:"100%"}} onClick={openConnectModal} type="button">
                     Connect Wallet
                   </button>
                 );
