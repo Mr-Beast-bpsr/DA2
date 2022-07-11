@@ -5,7 +5,8 @@ import EyeIcon from "../public/eye-icon.svg";
 
 import { Accordion } from "react-bootstrap";
 import Link from "next/link";
-import ReactPlayer from "react-player/lazy";
+import dynamic from "next/dynamic";
+const ReactPlayer = dynamic(() => import("react-player/lazy"), { ssr: false });
 
 import { useRouter } from "next/router";
 import axios from "axios";
