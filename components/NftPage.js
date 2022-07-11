@@ -33,7 +33,7 @@ const NftPage = ({ props }) => {
   const [address, setAddress] = useState(null);
   const [ended, setEnded] = useState(null);
   const [endAuction, setEndAuction] = useState(null);
-  const { data } = useAccount();
+  const data = useAccount();
   const [days, setDays] = useState(null);
   const [hours, setHours] = useState(null);
   const [minutes, setMinutes] = useState(null);
@@ -100,7 +100,7 @@ const NftPage = ({ props }) => {
   async function apiCall2(data) {
     if (data == null) return;
     let checkUser = {
-      userAddress: address,
+      userAddress: data?.address,
       auctionId: data.id,
       tokenId: nftContent.nftIndex,
     };
@@ -156,7 +156,7 @@ const NftPage = ({ props }) => {
       console.log(nftContent.id);
       let add = await axios.post("/api/music/addtoplaylist", {
         id: nftContent.id,
-        userAddress: address,
+        userAddress: data?.address,
       });
       console.log("ad");
       toast.success("Added to playlist", {
@@ -189,7 +189,7 @@ const NftPage = ({ props }) => {
 
       let add = await axios.post("/api/music/removeplaylist", {
         id: nftContent.id,
-        userAddress: address,
+        userAddress: data?.address,
       });
       console.log(add, "ad");
       toast.success("Removed from playlist", {

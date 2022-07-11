@@ -14,11 +14,11 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi'
 
 const NavBar = () => {
-  const { data, isError, isLoading } = useAccount()
+  const {  address} = useAccount()
   const router = useRouter();
-
-  const [account,setAccount] = useState( data?.address);
-  console.log(data?.address)
+console.log()
+  const [account,setAccount] = useState( address);
+  console.log(address)
 
 // useEffect(()=>{
 // console.log(router.pathname + account);
@@ -60,9 +60,9 @@ const NavBar = () => {
 
    useEffect(() => {
   //  navActive()
-  if(data?.address){
+  if(address){
 
-    localStorage.setItem("address",data?.address);
+    localStorage.setItem("address",address);
   }
 
    }, 
@@ -100,15 +100,15 @@ const NavBar = () => {
             </li>
             
             
-            { data?.address  && <li className="nav-item">
-              <Link href={"/assets/"+ data?.address}>
+            { address  && <li className="nav-item">
+              <Link href={"/assets/"+ address}>
               <a className={router.pathname=='/assets/[uid]' ?"nav-link active " :"nav-link "} >MY NFTS</a>
               </Link>
             </li>}
 
 
 
-        { data?.address &&
+        { address &&
               <li className="nav-item dropdown">
 
 
@@ -143,7 +143,7 @@ const NavBar = () => {
 
       </li>
             }
-           {data?.address && 
+           {address && 
            
            <li className="nav-item dropdown">
 
@@ -156,14 +156,14 @@ Playlist
 
 <Dropdown.Menu>
 
-   <Link  href={"/playlist/sound/"+ data?.address}>
+   <Link  href={"/playlist/sound/"+ address}>
  <li id="link-list" >
    Music
    </li>
    </Link>
 
 
- <Link  href={"/playlist/video/"+data?.address}  >
+ <Link  href={"/playlist/video/"+address}  >
  <li  id="link-list" >
    Video
  </li>
@@ -174,8 +174,8 @@ Playlist
 </Dropdown>
 
      */}
-{ data?.address  && <li className="nav-item">
-              <Link href={"/playlist/"+ data?.address}>
+{ address  && <li className="nav-item">
+              <Link href={"/playlist/"+ address}>
               <a className={router.pathname=='/assets/[uid]' ?"nav-link active " :"nav-link "} >Playlist</a>
               </Link>
             </li>}

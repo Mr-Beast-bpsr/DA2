@@ -12,7 +12,7 @@ import {useAccount} from "wagmi"
 // import "react-lazy-load-image-component/src/effects/blur.css";
 
 const HomeMap = (props) => {
-  const account = useAccount()
+  const {address} = useAccount()
   const { filterArray, setFilterArray } = useFilterContext();
   console.log(filterArray);
   console.log(props);
@@ -132,7 +132,7 @@ const HomeMap = (props) => {
               <Link
                 href={{
                   pathname: "/Collections/" + uri.id,
-                  query: { address: account.data?.address},
+                  query: { address: address},
                 }}
                 key={i}
               >

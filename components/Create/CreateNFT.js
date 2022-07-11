@@ -63,7 +63,8 @@ const CreateNFT = () => {
     },
   ]);
 
-  const account = useAccount();
+  const {address} = useAccount();
+  console.log(address)
   const { data, isError, isLoading, write } = useContractWrite(
     {
       addressOrName: "0x1D1AbF49249AAacd61E0694a8197410272d3baA1",
@@ -237,7 +238,7 @@ const CreateNFT = () => {
     setModalShow(true);
 
     write({
-      args: [account.data.address, parseInt(supply)],
+      args: [address, parseInt(supply)],
       overrides: {
         gasLimit: 3302558,
       },
@@ -282,7 +283,7 @@ const CreateNFT = () => {
       nftSampleImage: fileUrl3,
       freeForAll: freeCheck,
 
-      userAddress: account.data.address,
+      userAddress: address,
       imageType: type,
       totalSupply: supply,
       externalLink: externalLink,
@@ -293,7 +294,7 @@ const CreateNFT = () => {
     await axios.post("/api/mintpage", data);
     setTimeout(function () {
       setModalShow(false);
-      window.location.href = "/assets/" + account.data?.address;
+      window.location.href = "/assets/" + address;
     }, 8000);
   }
 
