@@ -63,10 +63,10 @@ const NftPage = ({ props }) => {
 
   useEffect(() => {
     let owner = localStorage.getItem("address");
-    setSell(data?.address.toLowerCase() == nftContent.nftOwner.toLowerCase());
+    setSell(data?.address?.toLowerCase() == nftContent.nftOwner?.toLowerCase());
     setAddress(data?.address);
     console.log(
-      data?.address.toLowerCase() == nftContent.nftOwner.toLowerCase()
+      data?.address?.toLowerCase() == nftContent.nftOwner?.toLowerCase()
     );
     console.log(data, nftContent.nftOwner.toLowerCase());
     if (new Date().getTime() > new Date(auction?.endDate)) {
