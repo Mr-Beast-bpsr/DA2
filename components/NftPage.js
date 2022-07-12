@@ -313,6 +313,10 @@ const NftPage = ({ props }) => {
                 ) : (
                   <ReactPlayer
                     playsinline
+                    playInline
+                    pip={true}
+                    muted
+                    
                     playing={true}
                     className="Da-Player"
                     url={nftContent.nftImage}
