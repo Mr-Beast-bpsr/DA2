@@ -6,10 +6,109 @@ div {
   font-family: "Montserrat", sans-serif;
 }
 
+/* ///////new modal//////// */
+#content-setting {
+  font-size: 14px;
+  font-weight: 500;
+}
+#content-setting ul {
+  list-style: none;
+  text-align: center;
+  padding: 0px;
+  padding-left: 0px;
+  margin-bottom: 0px;
+}
+#content-setting ul li {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#content-setting ul li:hover {
+  background-color: #111111;
+  color: yellow;
+}
+#content-setting ul li:hover {
+  box-shadow: rgb(255, 208, 0) 0px 1px 4px, rgb(243, 207, 5) 0px 0px 0px 3px;
+  transform: scale(120%);
+}
+#content-setting h5:hover {
+  border: 1px solid white;
+}
+.modal-ipt {
+  float: left;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.modal-headings {
+  float: left;
+  width: 100%;
+  padding-left: 37px;
+  font-size: 10px;
+}
+.mdl-input {
+  border: none !important;
+  background-color: unset !important;
+  border-bottom: 1px solid white !important;
+  color: white;
+  margin-top: 2px;
+  padding-left: 0px !important;
+}
+.create-playlist {
+  float: left;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+.playlist-btn {
+  float: right;
+  width: 50%;
+  margin-top: 10px;
+  background-color: unset !important;
+  border: none !important;
+  color: #587bee !important;
+}
+.mdl-input:focus-within {
+  background-color: unset !important;
+  outline: none !important;
+}
+.btn-check:focus + .btn-primary,
+.btn-primary:focus {
+  box-shadow: inset !important;
+}
+.btn-check:focus + .btn,
+.btn:focus {
+  box-shadow: inset !important;
+}
+.btn-check:active + .btn-primary:focus,
+.btn-check:checked + .btn-primary:focus,
+.btn-primary.active:focus,
+.btn-primary:active:focus,
+.show > .btn-primary.dropdown-toggle:focus {
+  box-shadow: unset !important;
+}
+.btn-check:focus + .btn-primary,
+.btn-primary:focus {
+  box-shadow: unset !important;
+}
+.btn-check:focus + .btn,
+.btn:focus {
+  box-shadow: unset !important;
+}
+.modal-marginset {
+  margin-left: 90px !important;
+}
+
+/* ////////////////////////// */
+
 .page-header {
   float: left;
   width: 100%;
-
   min-height: 100vh;
   background-image: url(/bg.jpg);
   background-size: cover;
@@ -118,6 +217,20 @@ header .navbar-expand-lg .navbar-collapse .nav-tabs .nav-item .nav-link:hover {
   height: 500px;
   object-fit: cover;
 }
+
+.sell-ptp {
+  margin-top: 5rem;
+  margin-bottom: 5rem;
+}
+
+/* .set-position {
+  width: 50%;
+  background: #242424;
+  padding: 1rem;
+  border: 1px solid rgb(255, 242, 0);
+  border-right: none;
+  border-radius: 30px 0 0 30px;
+} */
 
 @media screen and (max-width: 549px) {
   .video-container-styles {
@@ -2041,6 +2154,9 @@ form .div1-heading {
   .sellContainer {
     margin-top: 7rem;
   }
+  #sellContainer {
+    margin-top: 5rem;
+  }
 }
 @media screen and (max-width: 1400px) {
   #avax-text {
@@ -2184,6 +2300,10 @@ form .div1-heading {
 }
 
 @media screen and (max-width: 768px) {
+  .sell-ptp {
+    margin-top: 0rem;
+    margin-bottom: 0rem;
+  }
   .player {
     width: 100%;
   }
@@ -2359,9 +2479,43 @@ form .div1-heading {
     float: left;
     width: 85%;
   }
+  #mint-head {
+    padding: 0px !important;
+    flex-wrap: wrap;
+    flex-direction: column-reverse;
+  }
+  #type-article {
+    width: 100% !important;
+    border: 1px solid yellow;
+    border-radius: 0px 0 30px 30px !important;
+    margin-top: 0px;
+    margin-bottom: 30px;
+  }
+  #article-sell {
+    width: 100% !important;
+    border: 1px solid yellow;
+    border-radius: 30px 30px 0px 0 !important;
+    margin-top: 60px;
+    min-height: auto !important;
+  }
+  #sell-image {
+    margin-left: 0px !important;
+    margin: 0px !important;
+  }
+  #page-fixed {
+    position: fixed;
+    overflow: scroll;
+  }
+  /* #btn-position {margin-top: 50px !important;} */
+  .btn-list {
+    margin-top: 50px !important;
+  }
 }
 
 @media screen and (max-width: 576px) {
+  #article-sell {
+    min-height: auto !important;
+  }
   form .div1-heading {
     margin-top: 20px;
     margin-bottom: 0px !important;
@@ -2397,7 +2551,54 @@ form .div1-heading {
     width: 100%;
   }
 }
+
+@media (max-width: 575px) {
+  #content-setting .modal-content {
+    width: 55%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+@media (max-width: 557px) {
+  #content-setting .modal-content {
+    width: 56%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .modal-marginset {
+    margin-left: 65px !important;
+  }
+}
+
+@media (max-width: 513px) {
+  .modal-marginset {
+    margin-left: 50px !important;
+  }
+}
+
 @media screen and (max-width: 450px) {
+  #article-sell {
+    padding: 30px !important;
+  }
+  /* #sell-image {margin: 0px !important; margin-top: 0px !important;} */
+  .modal-marginset {
+    margin-left: 60px !important;
+  }
+
+  .modal-ipt {
+    align-items: unset;
+  }
+
+  .modal-headings {
+    padding-left: 0px;
+  }
+  #modal-hpt {
+    font-size: 1rem !important;
+  }
+  .modal-marginset {
+    margin-left: 65px;
+  }
+
   .mint-head {
     margin-bottom: 50px;
   }
@@ -2413,6 +2614,9 @@ form .div1-heading {
 }
 
 @media screen and (max-width: 414px) {
+  .modal-marginset {
+    margin-left: 55px !important;
+  }
   .page-head {
     float: left;
     width: 100%;
@@ -2538,6 +2742,10 @@ form .div1-heading {
 }
 
 @media screen and (max-width: 400px) {
+  .modal-marginset {
+    margin-left: 60px !important;
+  }
+
   .head-page .up-sec .head-part .circle {
     float: left;
     padding: 2px 13px;
@@ -2719,4 +2927,13 @@ div .properties::placeholder {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+@media screen and (max-width: 400px) {
+  .modal-marginset {
+    margin-left: 110px !important;
+  }
+  #content-setting .modal-content {
+    width: 80%;
+  }
 }

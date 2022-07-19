@@ -1,7 +1,8 @@
 import axios from "axios";
 import React, { useState, useRef, useEffect } from "react";
 import { Form, Button } from "react-bootstrap";
-import ReactPlayer from "react-player/lazy";
+import dynamic from "next/dynamic";
+const ReactPlayer = dynamic(() => import("react-player/lazy"), { ssr: false });
 
 import BasicDateRangePicker from "./ui/DatePicker";
 
@@ -9,36 +10,117 @@ import MyVerticallyCenteredModal from "./ui/MyVerticallyCenteredModal.js";
 import { startSale } from "./web/connect";
 import { useAppContext, useBalanceContext } from "../context/GlobalState";
 import { useRouter } from "next/router";
-
+import Sell from "./Sale/Sell";
+import {
+  useContractWrite,
+  useContractRead,
+  useWaitForTransaction,
+} from "wagmi";
+import ab from "../public/abi/DaAuction.json";
+let { abi } = ab;
 const SellPage = ({ id }) => {
-  console.log(id );
-  const [confirmation,setConfirmation] =useState(null)
-  const [success,setSuccess] =useState(false)
+  console.log(id);
+  const [confirmation, setConfirmation] = useState(null);
+  const [success, setSuccess] = useState(false);
   const [checkValue, setCheckValue] = useState(false);
-  const [errorMessage, setErrorMessage] =useState(null);
-  const router = useRouter();
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [modalShow, setModalShow] = useState(false);
   const { active, setActive } = useAppContext();
   const [closeModals, setCloseModals] = useState(false);
-  // console.log(id.id)
+  const quantityRef = useRef();
   const [radioValue, setRadioValue] = useState("1");
   const [dataa, setData] = useState(null);
-  // const radios = [
-  //   { name: "Fixed Price", value: "1" },
-  //   { name: "Timed Auction", value: "2" },
-  // ];
+
   const [value, setValue] = useState([
     new Date(),
     new Date(new Date() * (1.00005 + 0.00005 * 7)),
   ]);
   const priceRef = useRef();
-  // const startDateRef = useRef();
-  // const endDateRef = useRef();
+
   const formRef = useRef();
   const [transHash, setTransHash] = useState(null);
-  // const [active, setActive] = useState(false);
+
+  async function nftData() {
+    data = {
+      id: id.id,
+    };
+    let res = await axios.post("/api/nftpage", data);
+    let data = res.data;
+    console.log(data.data);
+    setData(data.data);
+  }
+
+  const { data, isError, isLoading, write } = useContractWrite(
+    {
+      addressOrName: "0xcC20b6B03Ffc0B03600cAA15323227EB1E15988E",
+      contractInterface: abi,
+      functionName: "listNft",
+ 
+      args: [],
+      onSettled(data, error) {
+        console.log("Settled", { data, error });
+        if (error) {
+          // setErrorMessage(error?.message);
+          setTimeout(function () {
+            setModalShow(false);
+          }, 2000);
+        }
+      },
+      onSuccess(data) {
+        setTransHash(data?.hash);
+        console.log("Success", data);
+      },
+    }
+  );
+
+  const token =  useContractRead({
+    addressOrName: "0x25c2eDa00B6282f57fd8289061a39522679bA756",
+    contractInterface: abi,
+    functionName: "balanceOf",
+    args: ['0xaA89b450b023763f5B30a4326681Da0D13930e2d',1],
+  });
+  console.log(token.data)
+  // useEffect(()=>{
+
+  //   console.log(token.data,token, "tokne")
+  // },[
+  //   token
+  // ])
+
+  // const waitForTransaction = useWaitForTransaction({
+  //   hash: data?.hash,
+  //   onSettled(data, error) {
+  //     setSuccess(true);
+  //     console.log("Settled Wait", { data, error });
+  //     // let token = getCurrentToken()
+  //     // console.log(token)
+  //     console.log(data);
+  //     let tokenId = parseInt(token.data);
+  //     if (data?.status == 1) {
+  //       apiCall(tokenId);
+  //       console.log("api");
+  //     }
+  //     if (data?.status == 0) {
+  //       setErrorMessage(error?.message);
+  //       setErrorMessage("Transaction failed");
+  //       setTimeout(function () {
+  //         setModalShow(false);
+  //       }, 2000);
+  //     }
+  //     if (error) {
+  //       setErrorMessage(
+  //         "An error has occurred please check etherscan for full details."
+  //       );
+  //       setTimeout(function () {
+  //         setModalShow(false);
+  //       }, 5000);
+  //       return;
+  //     }
+  //   },
+  // });
+
   async function sellHandler(e) {
     e.preventDefault();
-
     console.log(value[1], value[0]);
     if (value[1].toISOString() == value[0].toISOString()) {
       alert("Please select a valid date range !" + "can't be the same date");
@@ -47,7 +129,7 @@ const SellPage = ({ id }) => {
 
     let price = priceRef.current.value;
     let endDat = new Date(value[1]).toISOString().split("T")[0];
-    // console.log(endDat)
+    let quantity = quantityRef.current.value;
     let startDat = new Date(value[0]).toISOString().split("T")[0];
 
     let dateEnd = endDat.split("-");
@@ -63,68 +145,29 @@ const SellPage = ({ id }) => {
       auctionType = "1";
     }
     console.log(
-       dataa.nftContent.nftIndex,
-      id.id,
-      price,
-      startDate,
-      endDate,
-      setTransHash,
-      setActive,
-      startDat,
-      endDat,
-      setCloseModals,
-      auctionType);
-      setCloseModals(true)
-    await startSale(
-
-      dataa.nftContent.nftIndex,
-      id.id,
-      price,
-      startDate,
-      endDate,
-      auctionType,
-      setCloseModals,
-      setTransHash,
-      setConfirmation,
-      setSuccess,
-      setErrorMessage,    
-      startDat,
-      endDat,
+     dataa.nftContent.nftIndex, quantity, price, dataa.nftContent.commision
     );
+    write({
+      args: [dataa.nftContent.nftIndex, quantity, price, dataa.nftContent.commision],
+      overrides: {
+        gasLimit: 3802558,
+      },
+    });
+    setCloseModals(true);
     formRef.current.reset();
-    // if (!closeModals) {
-    //   router.push("/nftpage/" + id.id);
-    // }
-  }
-
-  async function nftData() {
-    data = {
-      id: id.id,
-    };
-    let res = await axios.post("/api/nftpage", data);
-    let data = res.data;
-    console.log(data.data);
-    setData(data.data);
   }
 
   useEffect(() => {
     nftData();
   }, []);
-  useEffect(() => {
-    if (radioValue === "2") {
-      setCheckValue(true);
-    }
-    if (radioValue === "1") {
-      setCheckValue(false);
-    }
-  }, [radioValue]);
-  if (dataa === null) {
-    return <div className="container">Loading...</div>;
-  }
+
+  // if (dataa === null) {
+  //   return <div className="container">Loading...</div>;
+  // }
 
   return (
-    <div className="mint-header page-header">
-      <div className="container  setContainer sellContainer">
+    <div className="mint-header page-header" id="page-fixed">
+      <div className="container  setContainer sellContainer" id="sellContainer">
         <MyVerticallyCenteredModal
           show={closeModals}
           value={transHash}
@@ -165,17 +208,17 @@ const SellPage = ({ id }) => {
                 >
                   <label style={{ color: "white", fontSize: "22px" }}>
                     {" "}
-                    Type
+                    Auction Type
                   </label>
 
-                  <Form>
+                  <div>
                     {["radio"].map((type) => (
                       <div
                         key={`default-${type}`}
                         className="mb-3"
                         style={{ color: "white", marginTop: "15px" }}
                       >
-                        <Form.Check
+                        {/* <Form.Check
                           onChange={(e) => {
                             setRadioValue(e.currentTarget.value);
                           }}
@@ -184,8 +227,7 @@ const SellPage = ({ id }) => {
                           name="group1"
                           type={type}
                           id={`inline-${type}-1`}
-                          // disabled
-                        />
+                        /> */}
                         <Form.Check
                           checked={"1" === radioValue}
                           onChange={(e) => {
@@ -197,23 +239,22 @@ const SellPage = ({ id }) => {
                           type={type}
                           id={`inline-${type}-1`}
                         />
-                        <Form.Check
+                        {/* <Form.Check
                           value="2"
                           checked={"2" === radioValue}
                           onChange={(e) => {
                             setRadioValue(e.currentTarget.value);
                           }}
-                          // checked={radioValue === radioValue}
                           label="Timed Auction"
                           name="group1"
                           type={type}
                           id={`inline-${type}-3`}
-                        />
+                        /> */}
                       </div>
                     ))}
-                  </Form>
+                  </div>
                 </div>
-                <div style={{ marginBottom: "35px" }}>
+                <div style={{ marginBottom: "15px", marginTop: "20px" }}>
                   {radioValue === "1" || radioValue === "3" ? (
                     ""
                   ) : (
@@ -243,42 +284,29 @@ const SellPage = ({ id }) => {
                     }}
                   /> */}
                       <h4 style={{ marginLeft: "10px", color: "red" }}>
-                        By default highest bid will be chosen.
+                        {/* By default highest bid will be chosen. */}
                       </h4>
                     </div>
                   )}
 
                   <div style={{ display: "flex" }}>
-                    <label
-                      style={{
-                        fontSize: "24px",
-                        color: "white",
-                        marginBottom: "2rem",
-                      }}
-                    >
-                      Price
-                    </label>
-                  </div>
-                  <div style={{ display: "flex" }}>
                     <div
                       className="price-div"
                       style={{
                         display: "flex",
-                        marginRight: "30px",
+                        marginRight: "65px",
                         padding: "10px",
+                        fontWeight: "bold",
                       }}
                     >
                       <div>
-                        <img
+                        {/* <img
                           src="/ethLogo.svg"
                           style={{ width: "34px", height: "34px" }}
-                        />
+                        /> */}
                       </div>
-                      <div
-                        className="price-font"
-                        style={{ marginLeft: "12px" }}
-                      >
-                        Poly
+                      <div className="price-font" style={{}}>
+                        Price
                       </div>
                       <div></div>
                     </div>
@@ -291,12 +319,35 @@ const SellPage = ({ id }) => {
                     />
                   </div>
                 </div>
+
+                <div style={{ display: "flex" }}>
+                  <label
+                    style={{
+                      fontSize: "20px",
+                      fontWeight: "bold",
+                      padding: "10px",
+                      marginBottom: "1rem",
+                    }}
+                    className="price-div"
+                  >
+                    Quantity
+                  </label>{" "}
+                  <input
+                    type="float"
+                    required
+                    ref={quantityRef}
+                    style={{ marginLeft: "20px" }}
+                    className="price-input"
+                  />
+                </div>
+
                 <div>
                   <div style={{ display: "flex" }}>
                     <label style={{ fontSize: "24px", color: "white" }}>
                       {radioValue !== "3" ? "Duration" : null}
                     </label>
                   </div>
+
                   {/* {radioValue === "1" ? (
                 <Form.Check
                   style={{ fontSize: "18px",  color: "white" }}
@@ -311,8 +362,8 @@ const SellPage = ({ id }) => {
                   
                 />
                 
-              ) : null}
-               */}
+              ) : null} */}
+
                   <div style={{ display: "flex", width: "100%" }}>
                     <div style={{ marginRight: "20px", width: "100%" }}>
                       <div>
@@ -329,14 +380,13 @@ const SellPage = ({ id }) => {
               </div>
               <Button
                 type="submit"
-                
-                className="btn  btn-position"
+                className="btn  btn-position "
                 id="btn-position"
                 style={
                   radioValue === "2"
                     ? { marginTop: "0" }
                     : radioValue === "1"
-                    ? { marginTop: "3rem" }
+                    ? { marginTop: "4rem" }
                     : { marginTop: "9rem" }
                 }
               >
@@ -348,8 +398,8 @@ const SellPage = ({ id }) => {
 
           {/* ////////////////////////////////////////////////////////////////// */}
           <div className="set-position" width="100%">
-            <div className="row row-of-article">
-              <article className="article-sell" style={{}}>
+            <article className="article-sell" id="article-sell" style={{}}>
+              <div className="row row-of-article">
                 <div className="container">
                   <div>
                     <h1
@@ -366,25 +416,24 @@ const SellPage = ({ id }) => {
                   </div>
                   <div>
                     <div>
-                    {dataa.nftContent.imageType == "0" ? (
-                    <img
-                      src={dataa.nftContent.nftImage}
-                      className="sell-image"
-
-                      alt="..."
-                    />
-                  ) : (
-                    <ReactPlayer
-                      playing={true}
-                      
-                      className="sell-image m-5"
-                      url={dataa.nftContent.nftImage}
-                      type="video/mp4"
-                      height="200%"
-                      width="100%"
-                      controls="true"
-                    />
-                  )}
+                      {dataa?.nftContent.imageType == "0" ? (
+                        <img
+                          src={dataa?.nftContent.nftImage}
+                          className="sell-image"
+                          alt="..."
+                        />
+                      ) : (
+                        <ReactPlayer
+                          playing={true}
+                          id="sell-image "
+                          className="sell-image sell-ptp"
+                          url={dataa?.nftContent.nftImage}
+                          type="video/mp4"
+                          height="200%"
+                          width="100%"
+                          controls="true"
+                        />
+                      )}
                     </div>
                   </div>
 
@@ -422,15 +471,15 @@ const SellPage = ({ id }) => {
                           <div
                             style={{ flex: "1", textTransform: "capitalize" }}
                           >
-                            {dataa.nftContent.nftIndexName.toLowerCase()}
+                            {dataa?.nftContent.nftIndexName.toLowerCase()}
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </article>
-            </div>
+              </div>
+            </article>
           </div>
         </div>
       </div>

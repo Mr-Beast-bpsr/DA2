@@ -5,7 +5,7 @@ export default async function handler(req, res) {
     let data = req.body;
     console.log(data);
     let datafirst = await axios.post(
-      "http://52.9.60.249:4000/api/v1/nft/removePlaylist",
+      "http://52.9.60.249:4000/api/v1/nft/removedata",
       data
     );
     // console.log(datafirst.data.data)

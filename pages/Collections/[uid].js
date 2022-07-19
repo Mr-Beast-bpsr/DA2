@@ -17,7 +17,7 @@ export async function getServerSideProps(context) {
   let tokenId = {
     tokenId: id,
     userAddress: 1,
-  };
+  }; 
   // try{
 
     const res = axios.post("http://52.9.60.249:4000/api/v1/nft/saveview", {

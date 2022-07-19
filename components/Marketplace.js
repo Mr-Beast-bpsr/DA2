@@ -180,7 +180,7 @@ useEffect(() => {
 
             <section className="input-part">
                 <div className="input-content">
-                  <h4 className="input-text">Rarity / Background</h4>
+                  <h4 className="input-text">Artist</h4>
                   <select 
                     onChange={(e) => {
 // e.preventDefault()
@@ -209,7 +209,7 @@ useEffect(() => {
                   </select>
                 </div>
                 <div className="input-content">
-                  <h4 className="input-text"> Accessories Body</h4>
+                  <h4 className="input-text"> Producer</h4>
                   <select
                     onChange={(e) => {
                       let arr = filterArray.list;
@@ -238,7 +238,7 @@ useEffect(() => {
                   </select>
                 </div>
                 <div className="input-content">
-                  <h4 className="input-text">Accessories Face</h4>
+                  <h4 className="input-text">Album</h4>
                   <select
                     onChange={(e) => {
                       let arr = filterArray.list;
@@ -263,7 +263,7 @@ useEffect(() => {
                   </select>
                 </div>
                 <div className="input-content">
-                  <h4 className="input-text">Shirt color</h4>
+                  <h4 className="input-text">Lable</h4>
                   <select
                     onChange={(e) => {
                       let arr = filterArray.list;
@@ -291,7 +291,7 @@ useEffect(() => {
                   </select>
                 </div>
                 <div className="input-content">
-                  <h4 className="input-text">Eye + expression</h4>
+                  <h4 className="input-text">Media</h4>
                   <select
                     onChange={(e) => {
                       if (e.target.value === "Select") {
@@ -316,7 +316,7 @@ useEffect(() => {
                   </select>
                 </div>
                 <div className="input-content">
-                  <h4 className="input-text">Body </h4>
+                  <h4 className="input-text">Genre </h4>
                   <select
                     onChange={(e) => {
                       if (e.target.value === "Select") {
@@ -340,7 +340,7 @@ useEffect(() => {
                     })}
                   </select>
                 </div>
-                <div className="input-content">
+                {/* <div className="input-content">
                   <h4 className="input-text">Tattoo</h4>
                   <select
                     onChange={(e) => {
@@ -415,7 +415,7 @@ useEffect(() => {
                       }
                     })}
                   </select>
-                </div>
+                </div> */}
               </section>
           </div>
 

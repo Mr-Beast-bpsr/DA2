@@ -2,6 +2,8 @@ import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
 // import 'react-h5-audio-player/lib/styles.less' Use LESS
 // import 'react-h5-audio-player/src/styles.scss' Use SASS
+// import Button from 'react-bootstrap/Button';
+import Collapse from "react-bootstrap/Collapse";
 
 import React, { useState } from "react";
 import Link from "next/link";
@@ -12,17 +14,20 @@ import { Player, ControlBar, FullscreenToggle, PlayToggle } from "video-react";
 import { Button } from "@mui/material";
 import { ButtonToolbar, CloseButton } from "react-bootstrap";
 import axios from "axios";
-import { useRouter } from "next/router";  
+import { useRouter } from "next/router";
 const MusicPlayer = ({ props }) => {
-  const router = useRouter()
-  console.log(router.query.uid)
-  console.log(props)
+  const router = useRouter();
+  console.log(router.query.uid);
+  // console.log(props)
   const audioPlayer = useRef();
   const videoPlayerRef = useRef();
   const [currentTimeState, setCurrentTimeState] = useState(0);
   const [playing, setPlaying] = useState(false);
+  const [playlistName, setPlaylistName] = useState();
+  const [allPlaylist, setAllPlaylist] = useState(null);
   // let playlist = props.data;
-  const [playlist, setPlaylist] = useState(props.data);
+  const [playlist, setPlaylist] = useState([]);
+  const [open, setOpen] = useState(false);
   // console.log(props.data);
   const [currentMusicIndex, setCurrentMusicIndex] = useState(0);
   const handleClickPrevious = () => {
@@ -62,22 +67,72 @@ const MusicPlayer = ({ props }) => {
     // console.log(audioPlayer.current)
   }
   useEffect(() => {
-    // console.log(audioPlayer.current.isPlaying());
-    // console.log(audioPlayer.current.audio.current.currentTime)
-    // console.log(audioPlayer.current.progressBar.current.ariaValueNow);
-  });
+    getAllplaylist();
+  }, []);
+  useEffect(() => {
+    if (allPlaylist) {
+      fetchSongs(allPlaylist[0]?.id);
+    }
+  }, [allPlaylist]);
   // Console.log(audioPlayer.current.audio.current.currentTime)
 
   async function remove(e) {
     e.preventDefault();
-    console.log(e.currentTarget.id);
+    let i = e.currentTarget.id;
+
     e.currentTarget.parentElement.remove();
     let add = await axios.post("/api/music/removeplaylist", {
-      id: e.currentTarget.id,
+      nftId: playlist[i].nftId,
+      playListId: playlist[i].playListId,
       userAddress: router.query.uid,
     });
-    
   }
+
+  async function getAllplaylist() {
+    try {
+      const res = await axios.post("/api/music/playlist/getAllPlaylist", {
+        userAddress: router.query.uid,
+      });
+      const request = res.data;
+      console.log(request.data)
+      setPlaylistName(request.data[0].playListName);
+      setAllPlaylist(request.data);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async function fetchSongs(e, n) {
+    try {
+      const res = await axios.post("/api/music/playlist/getSong", {
+        userAddress: router.query.uid,
+        playListId: e,
+      });
+      if (n) setPlaylistName(n);
+
+      const request = res.data;
+      console.log(request.data, "all play");
+      setPlaylist(request.data);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+async function removePlaylist(e) {
+  try {
+    const res = await axios.post("/api/music/playlist/removeplaylist", {
+      userAddress: router.query.uid,
+      id: e,
+    });
+    // if (n) setPlaylistName(n);
+
+    const request = res.data;
+    getAllplaylist()
+    console.log(request.data, "all play");
+  
+  } catch (err) {
+    console.log(err);
+  }
+}
   return (
     <div
       style={
@@ -134,8 +189,8 @@ const MusicPlayer = ({ props }) => {
           showProgress={true}
         />
       </div>
-      <div className="player" >
-        <ul className="player__playlist list" >
+      <div className="player">
+        <ul className="player__playlist list">
           <li className="player__song">
             <img
               className="player__img img"
@@ -144,13 +199,74 @@ const MusicPlayer = ({ props }) => {
               alt="cover"
             />
 
-            <p className="player__context" >
-              <b className="player__song-name" >Your Playlist</b>
-              <span className="flex"></span>
+            <p className="player__context ">
+ <b className="player__song-name">  {playlistName}</b>
             </p>
+            <div style={{ display: "flex" }} className="player__context">
+              <Button
+                variant="contained"
+                onClick={() => setOpen(!open)}
+                style={{
+                  height: "3rem",
+                  margin:'0.8rem',
+                  justifyContent: "flex-end ",
+                  width: "160px",
+                  marginLeft:"200px"
+                  
+                }}
+                aria-controls="example-collapse-text"
+                aria-expanded={open}
+              >
+                {"Select PlayList"}
+              </Button>
+              <Collapse in={open}>
+                <div
+                  className="mt-4"
+                  style={{  flexDirection: "column", width: "85%" , marginLeft:"3rem" }}
+                  id="example-collapse-text"
+                >
+                  {allPlaylist
+                    ? allPlaylist.map((item) => {
+                      console.log(item,"THius is dataaaaa")
+                      return(
+                        <div
+                          className="player__song "
+                          style={{ display: "flex", flexDirection: "row" }}
+                        >
+                          <div
+                            style={{ width: "100%", height: "2.5rem" }}
+                            onClick={(e) => {
+                              setPlaylist([]);
+                              fetchSongs(e.currentTarget.id, item.playListName);
+                            }}
+                            defaultValue={1}
+                            id={item.id}
+                            className="player__"
+                          >
+                            {item.playListName}
+                          </div>
+
+                          <Button
+                          value={item.id}
+                            className="cls-btn"
+                            variant="contained"
+                            color="error"
+                            onClick={e=>removePlaylist(e.currentTarget.value)}
+                          >
+                            {" "}
+                            Delete
+                          </Button>
+                        </div>
+                      )})
+                    : ""}
+                </div>
+              </Collapse>
+
+              <span className="flex"></span>
+            </div>
           </li>
 
-          {playlist.length > 0 ? (
+          {/* {playlist.length > 0 ? (
             ""
           ) : (
             <div>
@@ -158,7 +274,7 @@ const MusicPlayer = ({ props }) => {
               <p> "Your playlist seem's empty please add some music"</p>
               <Link href="/"> Go to Marketplace </Link>{" "}
             </div>
-          )}
+          )} */}
           {playlist.map((song, i) => {
             return (
               <li
@@ -172,14 +288,16 @@ const MusicPlayer = ({ props }) => {
                   // marginTop:"20px"
                 }}
               >
-                <div></div>
                 <div
                   className="player__song"
                   onClick={() => setCurrentMusicIndex(i)}
                 >
                   <img
                     className="player__img img"
-                    src={song.nftFeaturedImage || "http://physical-authority.surge.sh/imgs/1.jpg"}
+                    src={
+                      song.nftFeaturedImage ||
+                      "http://physical-authority.surge.sh/imgs/1.jpg"
+                    }
                     alt="cover"
                   />
 
@@ -196,13 +314,16 @@ const MusicPlayer = ({ props }) => {
                     src="http://physical-authority.surge.sh/music/1.mp3"
                   ></audio>
 
-                  <div id={song.nftId} value={song.nftId}  onClick={(e) => {
-                        remove(e);
-                      }}>
+                  <div
+                    id={i}
+                    value={song.playListId}
+                    onClick={(e) => {
+                      remove(e);
+                    }}
+                  >
                     <CloseButton
                       className="cls-btn"
                       variant={"danger"}
-                    
                     ></CloseButton>
                   </div>
                 </div>

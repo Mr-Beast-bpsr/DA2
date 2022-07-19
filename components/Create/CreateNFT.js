@@ -9,7 +9,9 @@ import { Spinner } from "react-bootstrap";
 import IconButton from "@material-ui/core/IconButton";
 import axios from "axios";
 import { Container, Icon, TextField } from "@material-ui/core";
-import ReactPlayer from "react-player/lazy";
+import dynamic from "next/dynamic";
+const ReactPlayer = dynamic(() => import("react-player/lazy"), { ssr: false });
+
 import { Remove, Add } from "@material-ui/icons";
 
 import { create } from "ipfs-http-client";
@@ -35,7 +37,7 @@ const CreateNFT = () => {
   const nameRef = useRef(null);
   const externalLinkRef = useRef(null);
   const descriptionRef = useRef(null);
-
+  const commisionRef = useRef(null);
   const supplyRef = useRef(null);
 
   const [fieldsCount, setFieldsCount] = useState(1);
@@ -63,15 +65,14 @@ const CreateNFT = () => {
     },
   ]);
 
-  const {address} = useAccount();
-  console.log(address)
+  const { address } = useAccount();
+  console.log(address);
   const { data, isError, isLoading, write } = useContractWrite(
     {
-      addressOrName: "0x1D1AbF49249AAacd61E0694a8197410272d3baA1",
+      addressOrName: "0x25c2eDa00B6282f57fd8289061a39522679bA756",
       contractInterface: abi,
-    },
-    "mint",
-    {
+      functionName: "mint",
+
       args: [],
       onSettled(data, error) {
         console.log("Settled", { data, error });
@@ -99,9 +100,9 @@ const CreateNFT = () => {
       let tokenId = parseInt(token.data);
       if (data?.status == 1) {
         apiCall(tokenId);
-        console.log("api")
+        console.log("api");
       }
-      if(data?.status == 0){
+      if (data?.status == 0) {
         setErrorMessage(error?.message);
         setErrorMessage("Transaction failed");
         setTimeout(function () {
@@ -119,14 +120,11 @@ const CreateNFT = () => {
       }
     },
   });
-  const token = useContractRead(
-    {
-      addressOrName: "0x1D1AbF49249AAacd61E0694a8197410272d3baA1",
-      contractInterface: abi,
-    },
-
-    "tokenIndex"
-  );
+  const token = useContractRead({
+    addressOrName: "0x25c2eDa00B6282f57fd8289061a39522679bA756",
+    contractInterface: abi,
+    functionName: "tokenIndex",
+  });
 
   // console.log(ethers.utils.BigNumber.from(0x1b))
 
@@ -240,7 +238,7 @@ const CreateNFT = () => {
     write({
       args: [address, parseInt(supply)],
       overrides: {
-        gasLimit: 3302558,
+      
       },
     });
   }
@@ -250,7 +248,7 @@ const CreateNFT = () => {
     const name = nameRef.current.value;
     const externalLink = externalLinkRef.current.value;
     const description = descriptionRef.current.value;
-
+    const commision = commisionRef.current.value;
     let supply = supplyRef.current.value;
 
     console.log(
@@ -286,6 +284,7 @@ const CreateNFT = () => {
       userAddress: address,
       imageType: type,
       totalSupply: supply,
+      commision: commision,
       externalLink: externalLink,
       propertyArray: inputFields,
     };
@@ -703,6 +702,38 @@ const CreateNFT = () => {
 
                     <input
                       ref={supplyRef}
+                      type="text"
+                      className="form-ipt"
+                      placeholder="1"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-ipt-sec">
+                    <h4 className="name-txt">Commision</h4>
+                    <p className="para-txt">
+                      {" "}
+                      The number of items that can be minted. No gas cost to
+                      you!
+                      <Tooltip
+                        title={
+                          "Minting is an action that brings an item into existence on the blockchain, and costs gas to do so."
+                        }
+                        placement="top-end"
+                        target="tooltip"
+                      >
+                        <img
+                          className="excllamation"
+                          src={Exclamation.src}
+                          height="18px"
+                          data-bs-toggle="tooltip"
+                          data-bs-placement="top"
+                        />
+                      </Tooltip>
+                    </p>
+
+                    <input
+                      ref={commisionRef}
                       type="text"
                       className="form-ipt"
                       placeholder="1"

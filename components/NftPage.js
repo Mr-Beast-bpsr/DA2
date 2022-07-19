@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import ArrowLeft from "..//public/arrow-left.svg";
-
 import EyeIcon from "../public/eye-icon.svg";
 
 import { Accordion } from "react-bootstrap";
@@ -13,9 +12,17 @@ import axios from "axios";
 
 import { useAccount } from "wagmi";
 import { ToastContainer, toast } from "react-toastify";
+import sell from "../components/Sale/Sell"
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
+import Modaal from "./ui/Modaal.js";
+// console.log(sell())
+
 
 const NftPage = ({ props }) => {
   console.log(props);
+  const [modalShow, setModalShow] = React.useState(false);
+
   const [inPlaylist, setInPlaylist] = useState(props.viewData.inPlaylist);
   const [loading, setLoading] = useState(true);
   const [heartActive, setHeartActive] = useState(props.viewData.fav);
@@ -76,7 +83,7 @@ const NftPage = ({ props }) => {
     }
     apiCall();
   }, []);
-  function onPlaceBid() {}
+  // function onPlaceBid() {}
   async function finalizeAuction(e) {
     e.preventDefault();
     await finalize(
@@ -155,9 +162,10 @@ const NftPage = ({ props }) => {
     e.preventDefault();
     if (data?.address) {
       console.log(nftContent.id);
-      let add = await axios.post("/api/music/addtoplaylist", {
+      let add = await axios.post("/api/music/playlist/addToPlayList", {
         id: nftContent.id,
         userAddress: data?.address,
+
       });
       console.log("ad");
       toast.success("Added to playlist", {
@@ -266,7 +274,15 @@ const NftPage = ({ props }) => {
   }, [auction, distance]);
 
   return (
+
+    
     <div className="page-header">
+        <Modaal
+        show={modalShow}
+        nftContent={nftContent?.nftId}
+        address={data?.address}
+        onHide={() => setModalShow(false)}
+      />
       <ToastContainer
         position="top-right"
         autoClose={5000}
@@ -312,11 +328,8 @@ const NftPage = ({ props }) => {
                   />
                 ) : (
                   <ReactPlayer
-                    playsinline
-                    playInline
+                    playsinline={true}
                     pip={true}
-                    muted
-                    
                     playing={true}
                     className="Da-Player"
                     url={nftContent.nftImage}
@@ -338,18 +351,24 @@ const NftPage = ({ props }) => {
                 ></div>
               </div>
 
+
               <div className="collect-top">
                 <div className="text-sec">
                   {/* <h6 className="collect-text"> Collection Name</h6> */}
                   {nftContent.imageType != 0 && !inPlaylist ? (
-                    <button
-                      onClick={addToPlayList}
+                    <Button
+                      // onClick={addToPlayList}
                       style={{ width: "50%" }}
                       className=" white-btn"
+                      variant="primary" 
+                      onClick={() => setModalShow(true)}
+
+
                     >
                       {" "}
                       Add to playlist
-                    </button>
+                    </Button>
+                    
                   ) : nftContent.imageType != 0 && inPlaylist ? (
                     <button
                       onClick={removePlaylist}
@@ -360,6 +379,12 @@ const NftPage = ({ props }) => {
                       Remove
                     </button>
                   ) : null}
+
+{/* <Button variant="primary" onClick={() => setModalShow(true)}>
+        Launch vertically centered modal
+      </Button> */}
+
+    
 
                   <p className="f-text">
                     <img className="eye" src={EyeIcon.src} alt="..." />{" "}
@@ -476,15 +501,18 @@ const NftPage = ({ props }) => {
                 ) : null}
 
                 {!auction && sell ? (
-                  <button
-                    onClick={onBid}
+                <Link href={"/sellpage/"+nftContent.id }>
+                <button
+                    // onClick={list.write}
+                    // onClick={router.push()}
                     className="btn   white-btn"
                     role="button"
                     data-bs-toggle="button"
                     aria-pressed="true"
-                  >
+                    >
                     Sell
                   </button>
+                    </Link>
                 ) : null}
               </div>
             </div>
