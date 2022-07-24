@@ -10,17 +10,19 @@ const ReactPlayer = dynamic(() => import("react-player/lazy"), { ssr: false });
 import { useRouter } from "next/router";
 import axios from "axios";
 
-import { useAccount } from "wagmi";
+import { useAccount, useContractWrite, useWaitForTransaction } from "wagmi";
 import { ToastContainer, toast } from "react-toastify";
-import sell from "../components/Sale/Sell"
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
+import sell from "../components/Sale/Sell";
+import Button from "react-bootstrap/Button";
+import Modal from "react-bootstrap/Modal";
 import Modaal from "./ui/Modaal.js";
-// console.log(sell())
-
+import ab from "../public/abi/DaAuction.json";
+import CreateNftModal from "./ui/TransModal";
+let { abi } = ab;
 
 const NftPage = ({ props }) => {
-  console.log(props);
+  const [errorMessage, setErrorMessage] = useState(null);
+
   const [modalShow, setModalShow] = React.useState(false);
 
   const [inPlaylist, setInPlaylist] = useState(props.viewData.inPlaylist);
@@ -34,11 +36,10 @@ const NftPage = ({ props }) => {
   const [activity, setActivity] = useState(null);
   const [sell, setSell] = useState(false);
   const [auctionEnd, setAuctionEnd] = useState(null);
-  const [claim, setClaim] = useState(false);
-  const [cancelClaimButton, setCancelClaimButton] = useState(false);
-  const [nftLink, setNftLink] = useState(null);
-  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+  const [closeModal, setCloseModal] = useState(false);
   const [address, setAddress] = useState(null);
+  const [transHash, setTransHash] = useState(null);
   const [ended, setEnded] = useState(null);
   const [endAuction, setEndAuction] = useState(null);
   const data = useAccount();
@@ -55,19 +56,41 @@ const NftPage = ({ props }) => {
   // const notify = () => t
   async function publicSaleHandler(e) {
     e.preventDefault();
-    await buy(
-      dataa.nftContent.nftIndex,
-      props.id,
-      auction.minAmount,
-      setTransHash,
-      setCloseModals,
-      auction.id,
-      setSuccess,
-      collectionAddress
-    );
+    setCloseModal(true);
+    setErrorMessage(null);
+    setTransHash(null);
+    // await buy(
+    //   dataa.nftContent.nftIndex,
+    //   props.id,
+    //   auction.minAmount,
+    //   setTransHash,
+    //   setCloseModals,
+    //   auction.id,
+    //   setSuccess,
+    //   collectionAddress
+    // );
+
+    buyNft.write({
+      args: [auction.id],
+      overrides: {
+        gasLimit: 3302558,
+      },
+    });
     //  setCloseModals(true)
   }
-  useEffect(() => {}, []);
+  async function apiCalla() {
+    let dat = {
+      auctionId: auction.id,
+      tokenId: props.id,
+      userAddress: data?.address,
+      holdings: 1,
+      amount: auction.minAmount,
+    };
+    console.warn(data, "data");
+    let bid = await axios.post("/api/nftpage/auction/placebidonauction", dat);
+    console.log(bid);
+  }
+  // useEffect(() => {}, []);
 
   useEffect(() => {
     let owner = localStorage.getItem("address");
@@ -84,19 +107,7 @@ const NftPage = ({ props }) => {
     apiCall();
   }, []);
   // function onPlaceBid() {}
-  async function finalizeAuction(e) {
-    e.preventDefault();
-    await finalize(
-      dataa.nftContent.nftIndex,
 
-      props.id,
-      setTransHash,
-      setCloseModals,
-      auction.id,
-      setSuccess,
-      collectionAddress
-    );
-  }
   async function apiCall() {
     setTimeout(function () {
       setLoading(false);
@@ -105,14 +116,16 @@ const NftPage = ({ props }) => {
   useEffect(() => {
     apiCall2(auction);
   }, [auction]);
-  async function apiCall2(data) {
+  async function apiCall2(dataa) {
     if (data == null) return;
     let checkUser = {
       userAddress: data?.address,
-      auctionId: data.id,
+      auctionId: dataa?.id,
       tokenId: nftContent.nftIndex,
     };
+
     // console.log(det)
+    console.log(checkUser);
     const response1 = await axios.post(
       "/api/nftpage/auction/checkuser",
       checkUser
@@ -122,7 +135,7 @@ const NftPage = ({ props }) => {
     console.log(data1.data);
     console.log(data1, "data");
     const response2 = await axios.post("/api/nftpage/auction/getbids", {
-      auctionId: data.id,
+      auctionId: dataa.id,
     });
 
     const data2 = await response2.data.data;
@@ -134,10 +147,6 @@ const NftPage = ({ props }) => {
   ////////////////////////////////////////////////
 
   ////////////////////////////////////////////////////////////
-  // console.log(props.id % 2)
-  function onBid() {
-    router.push("/sellpage/" + props.id);
-  }
 
   async function heart() {
     setHeartActive(!heartActive);
@@ -165,7 +174,6 @@ const NftPage = ({ props }) => {
       let add = await axios.post("/api/music/playlist/addToPlayList", {
         id: nftContent.id,
         userAddress: data?.address,
-
       });
       console.log("ad");
       toast.success("Added to playlist", {
@@ -273,11 +281,63 @@ const NftPage = ({ props }) => {
     return () => clearInterval(interval);
   }, [auction, distance]);
 
-  return (
+  const buyNft = useContractWrite({
+    addressOrName: "0xF2F15FEf19077661E3cFc4Aa488Fa5F53E205D5b",
+    contractInterface: abi,
+    functionName: "buyNFT",
 
-    
+    args: [],
+    onSettled(data, error) {
+      console.log("Settled", { data, error });
+      if (error) {
+        console.log("errord");
+        setTimeout(function () {
+          console.log(error);
+          setErrorMessage(error.message);
+          setCloseModal(false);
+        }, 2000);
+      }
+    },
+    onSuccess(data) {
+      setTransHash(data?.hash);
+      console.log("Success", data);
+    },
+  });
+  const waitForTransaction = useWaitForTransaction({
+    hash: buyNft.data?.hash,
+    onSettled(data, error) {
+      setSuccess(true);
+      console.log("Settled Wait", { data, error });
+      // let token = getCurrentToken()
+      // console.log(token)
+      console.log(data);
+
+      if (data?.status == 1) {
+        apiCalla();
+        setSuccess(true);
+        console.log("api");
+      }
+      if (data?.status == 0) {
+        setErrorMessage(error?.message);
+        setErrorMessage("Transaction failed");
+        setTimeout(function () {
+          setModalShow(false);
+        }, 2000);
+      }
+      if (error) {
+        setErrorMessage(
+          "An error has occurred please check etherscan for full details."
+        );
+        setTimeout(function () {
+          setCloseModal(false);
+        }, 5000);
+        return;
+      }
+    },
+  });
+  return (
     <div className="page-header">
-        <Modaal
+      <Modaal
         show={modalShow}
         nftContent={nftContent?.nftId}
         address={data?.address}
@@ -293,6 +353,13 @@ const NftPage = ({ props }) => {
         pauseOnFocusLoss
         draggable
         pauseOnHover
+      />
+      <CreateNftModal
+        show={closeModal}
+        transHash={transHash}
+        success={success}
+        // contractAddress={contractAddress}
+        errorMessage={errorMessage}
       />
       <section className="page-head">
         <div className="container">
@@ -328,13 +395,14 @@ const NftPage = ({ props }) => {
                   />
                 ) : (
                   <ReactPlayer
-                    playsinline={true}
+                    playinline={true}
                     pip={true}
                     playing={true}
                     className="Da-Player"
                     url={nftContent.nftImage}
                     type="video/mp4"
                     height="200%"
+                    muted={true}
                     width="100%"
                     controls={true}
                   />
@@ -351,7 +419,6 @@ const NftPage = ({ props }) => {
                 ></div>
               </div>
 
-
               <div className="collect-top">
                 <div className="text-sec">
                   {/* <h6 className="collect-text"> Collection Name</h6> */}
@@ -360,15 +427,12 @@ const NftPage = ({ props }) => {
                       // onClick={addToPlayList}
                       style={{ width: "50%" }}
                       className=" white-btn"
-                      variant="primary" 
+                      variant="primary"
                       onClick={() => setModalShow(true)}
-
-
                     >
                       {" "}
                       Add to playlist
                     </Button>
-                    
                   ) : nftContent.imageType != 0 && inPlaylist ? (
                     <button
                       onClick={removePlaylist}
@@ -380,11 +444,9 @@ const NftPage = ({ props }) => {
                     </button>
                   ) : null}
 
-{/* <Button variant="primary" onClick={() => setModalShow(true)}>
+                  {/* <Button variant="primary" onClick={() => setModalShow(true)}>
         Launch vertically centered modal
       </Button> */}
-
-    
 
                   <p className="f-text">
                     <img className="eye" src={EyeIcon.src} alt="..." />{" "}
@@ -473,46 +535,23 @@ const NftPage = ({ props }) => {
                   <button type="button" className="btn white-btn">
                     Cancel Sale
                   </button>
-                ) : auction?.auctionType == 2 && !sell && !ended ? (
-                  <button
-                    type="button"
-                    className="btn white-btn"
-                    onClick={onBid}
-                  >
-                    Bid
-                  </button>
-                ) : auction?.auctionType == 2 && sell && ended ? (
-                  <>
-                    <button
-                      type="button"
-                      className="btn white-btn"
-                      onClick={onBid}
-                    >
-                      Cancel Auction
-                    </button>
-                    <button
-                      type="button"
-                      className="btn white-btn"
-                      onClick={onBid}
-                    >
-                      Finalize
-                    </button>
-                  </>
-                ) : null}
+                ) : (
+                  ""
+                )}
 
                 {!auction && sell ? (
-                <Link href={"/sellpage/"+nftContent.id }>
-                <button
-                    // onClick={list.write}
-                    // onClick={router.push()}
-                    className="btn   white-btn"
-                    role="button"
-                    data-bs-toggle="button"
-                    aria-pressed="true"
+                  <Link href={"/sellpage/" + nftContent.id}>
+                    <button
+                      // onClick={list.write}
+                      // onClick={router.push()}
+                      className="btn   white-btn"
+                      role="button"
+                      data-bs-toggle="button"
+                      aria-pressed="true"
                     >
-                    Sell
-                  </button>
-                    </Link>
+                      Sell
+                    </button>
+                  </Link>
                 ) : null}
               </div>
             </div>

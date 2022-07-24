@@ -10,11 +10,11 @@ import { ToastContainer, toast } from "react-toastify";
 // import { useRouter } from "next/router";
 function MyVerticallyCenteredModal(props) {
   const router = useRouter();
-  console.log(router.query.address);
+
   const [show, setShow] = useState(true);
   const [playlist, setPlaylist] = useState(null);
   const textInputRef = useRef();
-  console.log(props.address, "prop wala address");
+  
 
 
   async function addToPlayList(e) {

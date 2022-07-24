@@ -12,7 +12,7 @@ const CreateNftModal = ({
   errorMessage,
   show,
 }) => {
-  console.log(show);
+
   const newUrl = "https://mumbai.polygonscan.com/tx/" + transHash;
   // console.log(props)
   return (
@@ -39,7 +39,7 @@ const CreateNftModal = ({
 
         <div className="text-break">
           {transHash}
-          {contractAddress !== null ? (
+          {contractAddress != null ? (
             <div
               className="text-break border"
               style={{ borderColer: "yellow" }}

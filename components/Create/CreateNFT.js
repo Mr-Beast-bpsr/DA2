@@ -67,28 +67,26 @@ const CreateNFT = () => {
 
   const { address } = useAccount();
   console.log(address);
-  const { data, isError, isLoading, write } = useContractWrite(
-    {
-      addressOrName: "0x25c2eDa00B6282f57fd8289061a39522679bA756",
-      contractInterface: abi,
-      functionName: "mint",
+  const { data, isError, isLoading, write } = useContractWrite({
+    addressOrName: "0x162bA189fCfA19207BCcCDf454C7D3d9Da022cdC",
+    contractInterface: abi,
+    functionName: "mint",
 
-      args: [],
-      onSettled(data, error) {
-        console.log("Settled", { data, error });
-        if (error) {
-          setErrorMessage(error?.message);
-          setTimeout(function () {
-            setModalShow(false);
-          }, 2000);
-        }
-      },
-      onSuccess(data) {
-        setTransHash(data?.hash);
-        console.log("Success", data);
-      },
-    }
-  );
+    args: [],
+    onSettled(data, error) {
+      console.log("Settled", { data, error });
+      if (error) {
+        setErrorMessage(error?.message);
+        setTimeout(function () {
+          setModalShow(false);
+        }, 2000);
+      }
+    },
+    onSuccess(data) {
+      setTransHash(data?.hash);
+      console.log("Success", data);
+    },
+  });
   const waitForTransaction = useWaitForTransaction({
     hash: data?.hash,
     onSettled(data, error) {
@@ -121,7 +119,7 @@ const CreateNFT = () => {
     },
   });
   const token = useContractRead({
-    addressOrName: "0x25c2eDa00B6282f57fd8289061a39522679bA756",
+    addressOrName: "0x162bA189fCfA19207BCcCDf454C7D3d9Da022cdC",
     contractInterface: abi,
     functionName: "tokenIndex",
   });
@@ -237,9 +235,7 @@ const CreateNFT = () => {
 
     write({
       args: [address, parseInt(supply)],
-      overrides: {
-      
-      },
+      overrides: {},
     });
   }
 

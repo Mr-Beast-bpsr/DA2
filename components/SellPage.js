@@ -7,19 +7,22 @@ const ReactPlayer = dynamic(() => import("react-player/lazy"), { ssr: false });
 import BasicDateRangePicker from "./ui/DatePicker";
 
 import MyVerticallyCenteredModal from "./ui/MyVerticallyCenteredModal.js";
-import { startSale } from "./web/connect";
-import { useAppContext, useBalanceContext } from "../context/GlobalState";
-import { useRouter } from "next/router";
-import Sell from "./Sale/Sell";
+import { useAppContext } from "../context/GlobalState";
+
 import {
   useContractWrite,
   useContractRead,
   useWaitForTransaction,
+  useSignMessage,
+  useAccount,
 } from "wagmi";
 import ab from "../public/abi/DaAuction.json";
+import ab2 from "../public/abi/DaFactory.json";
+let { abi2 } = ab2;
 let { abi } = ab;
 const SellPage = ({ id }) => {
   console.log(id);
+  let { address, isConnecting, isDisconnected } = useAccount();
   const [confirmation, setConfirmation] = useState(null);
   const [success, setSuccess] = useState(false);
   const [checkValue, setCheckValue] = useState(false);
@@ -50,36 +53,60 @@ const SellPage = ({ id }) => {
     setData(data.data);
   }
 
-  const { data, isError, isLoading, write } = useContractWrite(
-    {
-      addressOrName: "0xcC20b6B03Ffc0B03600cAA15323227EB1E15988E",
-      contractInterface: abi,
-      functionName: "listNft",
- 
-      args: [],
-      onSettled(data, error) {
-        console.log("Settled", { data, error });
-        if (error) {
-          // setErrorMessage(error?.message);
-          setTimeout(function () {
-            setModalShow(false);
-          }, 2000);
-        }
-      },
-      onSuccess(data) {
-        setTransHash(data?.hash);
-        console.log("Success", data);
-      },
-    }
-  );
-
-  const token =  useContractRead({
-    addressOrName: "0x25c2eDa00B6282f57fd8289061a39522679bA756",
+  const { data, isError, isLoading, write } = useContractWrite({
+    addressOrName: "0xF2F15FEf19077661E3cFc4Aa488Fa5F53E205D5b",
     contractInterface: abi,
-    functionName: "balanceOf",
-    args: ['0xaA89b450b023763f5B30a4326681Da0D13930e2d',1],
+    functionName: "listNft",
+
+    args: [],
+    onSettled(data, error) {
+      console.log("Settled", { data, error });
+      if (error) {
+  console.log("errord")
+        setTimeout(function () {
+          setErrorMessage(error)
+          setCloseModals(false);
+        }, 2000);
+      }
+    },
+    onSuccess(data) {
+      setTransHash(data?.hash);
+      console.log("Success", data);
+    },
   });
-  console.log(token.data)
+  const approve = useContractWrite({
+    addressOrName: "0x162bA189fCfA19207BCcCDf454C7D3d9Da022cdC",
+    contractInterface: abi2,
+    functionName: "CustomApprovalForAll",
+
+    args: ["0xF2F15FEf19077661E3cFc4Aa488Fa5F53E205D5b", 1],
+    onSettled(data, error) {
+      console.log("Settled", { data, error });
+      if (data) {
+    sellHandler()
+      }
+      if (error) {
+        // console.warn("Dsata")
+        // setModalShow(false);
+      }
+    },
+  });
+  const signMessage = useSignMessage({
+    message:
+      "This is a sign message for approval of listing your NFT on market place, note that this is a one time process.",
+    onSettled(data, error) {
+      console.log("Settled", { data, error });
+      if (data) {
+        approve.write();
+        // console.log("error")
+      }
+      if (error) {
+        // console.warn("Dsata")
+        setModalShow(false);
+      }
+    },
+  });
+  // console.log(token.data);
   // useEffect(()=>{
 
   //   console.log(token.data,token, "tokne")
@@ -87,40 +114,66 @@ const SellPage = ({ id }) => {
   //   token
   // ])
 
-  // const waitForTransaction = useWaitForTransaction({
-  //   hash: data?.hash,
-  //   onSettled(data, error) {
-  //     setSuccess(true);
-  //     console.log("Settled Wait", { data, error });
-  //     // let token = getCurrentToken()
-  //     // console.log(token)
-  //     console.log(data);
-  //     let tokenId = parseInt(token.data);
-  //     if (data?.status == 1) {
-  //       apiCall(tokenId);
-  //       console.log("api");
-  //     }
-  //     if (data?.status == 0) {
-  //       setErrorMessage(error?.message);
-  //       setErrorMessage("Transaction failed");
-  //       setTimeout(function () {
-  //         setModalShow(false);
-  //       }, 2000);
-  //     }
-  //     if (error) {
-  //       setErrorMessage(
-  //         "An error has occurred please check etherscan for full details."
-  //       );
-  //       setTimeout(function () {
-  //         setModalShow(false);
-  //       }, 5000);
-  //       return;
-  //     }
-  //   },
-  // });
+  const waitForTransaction = useWaitForTransaction({
+    hash: data?.hash,
+    onSettled(data, error) {
+      setSuccess(true);
+      console.log("Settled Wait", { data, error });
+      // let token = getCurrentToken()
+      // console.log(token)
+      console.log(data);
+    
+      if (data?.status == 1) {
+        apiCall();
+        setSuccess(true);
+        console.log("api");
+      }
+      if (data?.status == 0) {
+        setErrorMessage(error?.message);
+        setErrorMessage("Transaction failed");
+        setTimeout(function () {
+          setModalShow(false);
+        }, 2000);
+      }
+      if (error) {
+        setErrorMessage(
+          "An error has occurred please check etherscan for full details."
+        );
+        setTimeout(function () {
+          setModalShow(false);
+        }, 5000);
+        return;
+      }
+    },
+  });
+  const isApproved = useContractRead({
+    addressOrName: "0x162bA189fCfA19207BCcCDf454C7D3d9Da022cdC",
+    contractInterface: abi2,
+    functionName: "isApprovedForAll",
+    args: [address, "0xF2F15FEf19077661E3cFc4Aa488Fa5F53E205D5b"],
+  });
+
+  async function approval(e) {
+    e.preventDefault();
+    if (value[1].toISOString() == value[0].toISOString()) {
+      alert("Please select a valid date range !" + "can't be the same date");
+      return;
+    }
+    let price = priceRef.current.value;
+    let quantity = quantityRef.current.value;
+
+    
+    if (isApproved.data) {
+    sellHandler()
+      return;
+    }
+          await signMessage.signMessage();
+  }
 
   async function sellHandler(e) {
-    e.preventDefault();
+    // e.preventDefault();/
+    console.log(isApproved.data);
+
     console.log(value[1], value[0]);
     if (value[1].toISOString() == value[0].toISOString()) {
       alert("Please select a valid date range !" + "can't be the same date");
@@ -145,14 +198,26 @@ const SellPage = ({ id }) => {
       auctionType = "1";
     }
     console.log(
-     dataa.nftContent.nftIndex, quantity, price, dataa.nftContent.commision
+      dataa.nftContent.nftIndex,
+      quantity,
+      price,
+      dataa.nftContent.commision
     );
+
+
     write({
-      args: [dataa.nftContent.nftIndex, quantity, price, dataa.nftContent.commision],
+      args: [
+        dataa.nftContent.nftIndex,
+        quantity,
+        price,
+        dataa.nftContent.commision,
+      ],
       overrides: {
         gasLimit: 3802558,
-      },
-    });
+      }})
+
+
+
     setCloseModals(true);
     formRef.current.reset();
   }
@@ -160,7 +225,33 @@ const SellPage = ({ id }) => {
   useEffect(() => {
     nftData();
   }, []);
+async function apiCall() {
+  let price = priceRef.current.value;
+  let endDat = new Date(value[1]).toISOString().split("T")[0];
+  let quantity = quantityRef.current.value;
+  let startDat = new Date(value[0]).toISOString().split("T")[0];
 
+  let dateEnd = endDat.split("-");
+  let dateStart = startDat.split("-");
+
+  let endDate = dateEnd[0] + dateEnd[1] + dateEnd[2];
+  let startDate = dateStart[0] + dateStart[1] + dateStart[2];
+  let dat = {
+    tokenId:    dataa.nftContent.nftIndex,
+    userAddress: address,
+    auctionType: 1,
+    startDate: startDat,
+    endDate: endDat,
+    minAmount: price,
+    quantity: quantity
+  };
+  setSuccess(true);
+  const response = await axios.post(
+    "/api/nftpage/auction/startauction",
+    dat
+  );
+
+}
   // if (dataa === null) {
   //   return <div className="container">Loading...</div>;
   // }
@@ -170,8 +261,9 @@ const SellPage = ({ id }) => {
       <div className="container  setContainer sellContainer" id="sellContainer">
         <MyVerticallyCenteredModal
           show={closeModals}
-          value={transHash}
-          success={true.toString()}
+          hash={transHash}
+          error={errorMessage}
+          suc={success}
           onHide={() => {
             setTransHash(null);
             setActive(false);
@@ -189,7 +281,7 @@ const SellPage = ({ id }) => {
             }}
           >
             <Form
-              onSubmit={sellHandler}
+              onSubmit={approval}
               ref={formRef}
               style={{
                 display: "flex",
