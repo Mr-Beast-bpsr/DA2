@@ -18,9 +18,11 @@ import {
 } from "wagmi";
 import ab from "../public/abi/DaAuction.json";
 import ab2 from "../public/abi/DaFactory.json";
+import { ethers } from "ethers";
 let { abi2 } = ab2;
 let { abi } = ab;
 const SellPage = ({ id }) => {
+  
   console.log(id);
   let { address, isConnecting, isDisconnected } = useAccount();
   const [confirmation, setConfirmation] = useState(null);
@@ -203,13 +205,13 @@ const SellPage = ({ id }) => {
       price,
       dataa.nftContent.commision
     );
-
-
+  let priced =   ethers.utils.parseEther( price) 
+console.log(priced,"dddddddddd")
     write({
       args: [
         dataa.nftContent.nftIndex,
         quantity,
-        price,
+        priced,
         dataa.nftContent.commision,
       ],
       overrides: {
@@ -278,7 +280,7 @@ async function apiCall() {
               overflow: "auto",
               width: "50%",
               padding: "2rem",
-            }}
+            }}  
           >
             <Form
               onSubmit={approval}

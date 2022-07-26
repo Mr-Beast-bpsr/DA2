@@ -32,7 +32,7 @@ const NftPage = ({ props }) => {
   const [nftContent, setNftContent] = useState(props.data.nftContent);
   const [nftTraits, setNftTraits] = useState(props.data.traits);
   const router = useRouter();
-
+  // console.log(nftContent);
   const [activity, setActivity] = useState(null);
   const [sell, setSell] = useState(false);
   const [auctionEnd, setAuctionEnd] = useState(null);
@@ -59,16 +59,6 @@ const NftPage = ({ props }) => {
     setCloseModal(true);
     setErrorMessage(null);
     setTransHash(null);
-    // await buy(
-    //   dataa.nftContent.nftIndex,
-    //   props.id,
-    //   auction.minAmount,
-    //   setTransHash,
-    //   setCloseModals,
-    //   auction.id,
-    //   setSuccess,
-    //   collectionAddress
-    // );
 
     buyNft.write({
       args: [auction.id],
@@ -76,8 +66,27 @@ const NftPage = ({ props }) => {
         gasLimit: 3302558,
       },
     });
-    //  setCloseModals(true)
   }
+
+  async function stopSaleHandler(e) {
+    e.preventDefault();
+    setCloseModal(true);
+    setErrorMessage(null);
+    setTransHash(null);
+    stopSale.write({
+      args: [auction.id],
+      overrides: {
+        gasLimit: 3302558,
+      },
+    });
+  }
+  async function stopSaleAPiCall() {
+    let data = { id: auction?.id, amount: auction?.minAmount };
+    let res = await axios.post("/api/nftpage/auction/closebid", data);
+    console.log(res.data.data);
+    location.reload()
+  }
+
   async function apiCalla() {
     let dat = {
       auctionId: auction.id,
@@ -95,6 +104,7 @@ const NftPage = ({ props }) => {
   useEffect(() => {
     let owner = localStorage.getItem("address");
     setSell(data?.address?.toLowerCase() == nftContent.nftOwner?.toLowerCase());
+
     setAddress(data?.address);
     console.log(
       data?.address?.toLowerCase() == nftContent.nftOwner?.toLowerCase()
@@ -105,6 +115,9 @@ const NftPage = ({ props }) => {
       setEnded(true);
     }
     apiCall();
+    const res = axios.post("http://52.9.60.249:4000/api/v1/nft/saveview", {
+      tokenId: nftContent.nftId,
+    });
   }, []);
   // function onPlaceBid() {}
 
@@ -116,28 +129,10 @@ const NftPage = ({ props }) => {
   useEffect(() => {
     apiCall2(auction);
   }, [auction]);
-  async function apiCall2(dataa) {
-    if (data == null) return;
-    let checkUser = {
-      userAddress: data?.address,
-      auctionId: dataa?.id,
-      tokenId: nftContent.nftIndex,
-    };
-
-    // console.log(det)
-    console.log(checkUser);
-    const response1 = await axios.post(
-      "/api/nftpage/auction/checkuser",
-      checkUser
-    );
-
-    const data1 = await response1.data;
-    console.log(data1.data);
-    console.log(data1, "data");
-    const response2 = await axios.post("/api/nftpage/auction/getbids", {
-      auctionId: dataa.id,
+  async function apiCall2() {
+    const response2 = await axios.post("/api/nftpage/auction/getowners", {
+      nftId: nftContent.nftId,
     });
-
     const data2 = await response2.data.data;
     console.log(data2, "Data!");
     setActivity(data2);
@@ -167,71 +162,37 @@ const NftPage = ({ props }) => {
     }
   }
 
-  async function addToPlayList(e) {
-    e.preventDefault();
-    if (data?.address) {
-      console.log(nftContent.id);
-      let add = await axios.post("/api/music/playlist/addToPlayList", {
-        id: nftContent.id,
-        userAddress: data?.address,
-      });
-      console.log("ad");
-      toast.success("Added to playlist", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-      setInPlaylist(true);
-      return;
-    }
-    toast.error("Please Connect wallet!", {
-      position: "top-right",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  }
-
-  async function removePlaylist(e) {
-    e.preventDefault();
-    if (data?.address) {
-      setInPlaylist(false);
-
-      let add = await axios.post("/api/music/removeplaylist", {
-        id: nftContent.id,
-        userAddress: data?.address,
-      });
-      console.log(add, "ad");
-      toast.success("Removed from playlist", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-      return;
-    }
-    ("");
-    console.log(address);
-    toast.error("Please Connect wallet!", {
-      position: "top-right",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  }
+  // async function addToPlayList(e) {
+  //   e.preventDefault();
+  //   if (data?.address) {
+  //     console.log(nftContent.id);
+  //     let add = await axios.post("/api/music/playlist/addToPlayList", {
+  //       id: nftContent.id,
+  //       userAddress: data?.address,
+  //     });
+  //     console.log("ad");
+  //     toast.success("Added to playlist", {
+  //       position: "top-right",
+  //       autoClose: 5000,
+  //       hideProgressBar: false,
+  //       closeOnClick: true,
+  //       pauseOnHover: true,
+  //       draggable: true,
+  //       progress: undefined,
+  //     });
+  //     setInPlaylist(true);
+  //     return;
+  //   }
+  //   toast.error("Please Connect wallet!", {
+  //     position: "top-right",
+  //     autoClose: 5000,
+  //     hideProgressBar: false,
+  //     closeOnClick: true,
+  //     pauseOnHover: true,
+  //     draggable: true,
+  //     progress: undefined,
+  //   });
+  // }
 
   function notALoop(distance) {
     // if (auction){
@@ -303,6 +264,63 @@ const NftPage = ({ props }) => {
       console.log("Success", data);
     },
   });
+
+  const stopSale = useContractWrite({
+    addressOrName: "0xF2F15FEf19077661E3cFc4Aa488Fa5F53E205D5b",
+    contractInterface: abi,
+    functionName: "stopSale",
+
+    args: [],
+    onSettled(data, error) {
+      console.log("Settled", { data, error });
+      if (error) {
+        console.log("errord");
+        setTimeout(function () {
+          console.log(error);
+          setErrorMessage(error.message);
+          setCloseModal(false);
+        }, 2000);
+      }
+    },
+    onSuccess(data) {
+      setTransHash(data?.hash);
+      console.log("Success", data);
+    },
+  });
+
+  const waitForTransactions = useWaitForTransaction({
+    hash: stopSale.data?.hash,
+    onSettled(data, error) {
+      setSuccess(true);
+      console.log("Settled Wait", { data, error });
+      // let token = getCurrentToken()
+      // console.log(token)
+      console.log(data);
+
+      if (data?.status == 1) {
+        stopSaleAPiCall();
+        setSuccess(true);
+        console.log("api");
+      }
+      if (data?.status == 0) {
+        setErrorMessage(error?.message);
+        setErrorMessage("Transaction failed");
+        setTimeout(function () {
+          setModalShow(false);
+        }, 2000);
+      }
+      if (error) {
+        setErrorMessage(
+          "An error has occurred please check etherscan for full details."
+        );
+        setTimeout(function () {
+          setCloseModal(false);
+        }, 5000);
+        return;
+      }
+    },
+  });
+
   const waitForTransaction = useWaitForTransaction({
     hash: buyNft.data?.hash,
     onSettled(data, error) {
@@ -422,7 +440,7 @@ const NftPage = ({ props }) => {
               <div className="collect-top">
                 <div className="text-sec">
                   {/* <h6 className="collect-text"> Collection Name</h6> */}
-                  {nftContent.imageType != 0 && !inPlaylist ? (
+                  {nftContent.imageType != 0 && nftContent.freeForAll ? (
                     <Button
                       // onClick={addToPlayList}
                       style={{ width: "50%" }}
@@ -433,16 +451,9 @@ const NftPage = ({ props }) => {
                       {" "}
                       Add to playlist
                     </Button>
-                  ) : nftContent.imageType != 0 && inPlaylist ? (
-                    <button
-                      onClick={removePlaylist}
-                      style={{ width: "50%" }}
-                      className=" white-btn"
-                    >
-                      {" "}
-                      Remove
-                    </button>
-                  ) : null}
+                  ) : (
+                    ""
+                  )}
 
                   {/* <Button variant="primary" onClick={() => setModalShow(true)}>
         Launch vertically centered modal
@@ -531,8 +542,12 @@ const NftPage = ({ props }) => {
                   >
                     Buy
                   </button>
-                ) : auction?.auctionType == 1 && sell && ended ? (
-                  <button type="button" className="btn white-btn">
+                ) : auction?.auctionType == 1 && sell ? (
+                  <button
+                    type="button"
+                    onClick={stopSaleHandler}
+                    className="btn white-btn"
+                  >
                     Cancel Sale
                   </button>
                 ) : (
@@ -693,7 +708,7 @@ const NftPage = ({ props }) => {
                             <tr>
                               <th scope="col">Event</th>
                               <th scope="col">Price</th>
-                              <th scope="col">From</th>
+                              {/* <th scope="col">From</th>  */}
                               <th scope="col" className="table-txt">
                                 To
                               </th>
@@ -705,14 +720,12 @@ const NftPage = ({ props }) => {
                                 return (
                                   <tr key={i}>
                                     <td className="tld">
-                                      <img className="h-icon" src={hIcon.src} />{" "}
-                                      Bid
+                                      {/* <img className="h-icon" src={hIcon.src} />{" "} */}
+                                      {act.event}
                                     </td>
-                                    <td className="tld">
-                                      <img src={avaxLogo.src} /> {act.amount}
-                                    </td>
+                                    <td className="tld">{act.amount}</td>
                                     <td style={{ overflowWrap: "anywhere" }}>
-                                      {act.userAddress}
+                                      {act.to}
                                     </td>
 
                                     <td>

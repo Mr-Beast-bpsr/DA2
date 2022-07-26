@@ -941,6 +941,18 @@ header .navbar-expand-lg .navbar-nav .dropdown-menu {
   color: white !important;
   text-align: center;
 }
+
+#playBG:hover{
+background-color:rgb(50, 52, 53);
+color:white;
+font-weight: 600;
+
+}
+#playBG{
+  justify-content:center;
+  align-items:center;
+  padding:10px;
+}
 .modal-content {
   background-color: black !important;
   border-radius: 30px !important;

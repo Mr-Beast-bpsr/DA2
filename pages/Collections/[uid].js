@@ -18,7 +18,7 @@ export async function getServerSideProps(context) {
     tokenId: id,
     userAddress: 1,
   }; 
-  // try{
+  try{
 
     const res = axios.post("http://52.9.60.249:4000/api/v1/nft/saveview", {
       tokenId: id,
@@ -38,9 +38,7 @@ export async function getServerSideProps(context) {
       console.log(check.data)
       const auctionData = check.data.data
       const viewData = await rest.data.data;
-      // console.log(viewData)
-      // console.log(id)
-      
+   
       return {
         props: {
           id,
@@ -48,5 +46,5 @@ export async function getServerSideProps(context) {
           data,auctionData
         },
       };
-    // }catch (er) {console.log(er)}
+    }catch (er) {console.log(er)}
 }

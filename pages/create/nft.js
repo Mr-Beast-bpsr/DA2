@@ -5,7 +5,6 @@ import CreateNFT from '../../components/Create/CreateNFT'
 const nft = () => {
   return (
       <CreateNFT/>
-  
   )
 }
 

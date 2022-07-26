@@ -231,6 +231,7 @@ async function removePlaylist(e) {
                       return(
                         <div
                           className="player__song "
+                          id="playBG"
                           style={{ display: "flex", flexDirection: "row" }}
                         >
                           <div

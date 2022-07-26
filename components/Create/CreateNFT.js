@@ -2,20 +2,18 @@ import React, { useState, useRef } from "react";
 import ImgIcon from "../../public/img-icon.svg";
 import Exclamation from "../../public/exclamation.png";
 import ThreeLines from "../../public/three-lines.PNG";
-import Plus from "../../public/plus.png";
-import Exclamation1 from "../../public/exclamation1.png";
 import { Tooltip } from "@mui/material";
 import { Spinner } from "react-bootstrap";
 import IconButton from "@material-ui/core/IconButton";
 import axios from "axios";
-import { Container, Icon, TextField } from "@material-ui/core";
+import {  TextField } from "@material-ui/core";
 import dynamic from "next/dynamic";
 const ReactPlayer = dynamic(() => import("react-player/lazy"), { ssr: false });
 
 import { Remove, Add } from "@material-ui/icons";
 
 import { create } from "ipfs-http-client";
-import { mintNft } from "../web/connect";
+
 import CreateNftModal from "../ui/TransModal";
 import {
   useAccount,
@@ -24,11 +22,8 @@ import {
   useContractRead,
 } from "wagmi";
 import ab from "../../public/abi/DaFactory.json";
-import ab2 from "../../public/abi/DaAuction.json";
-import Wagmi from "../web/Wagmi";
-const { abi2 } = ab2;
+
 const { abi } = ab;
-import { ethers } from "ethers";
 /* Create an instance of the client */
 
 const CreateNFT = () => {
