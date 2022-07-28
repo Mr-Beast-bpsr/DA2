@@ -19,15 +19,15 @@ import {
 import ab from "../public/abi/DaAuction.json";
 import ab2 from "../public/abi/DaFactory.json";
 import { ethers } from "ethers";
+import { useRouter } from "next/router";
 let { abi2 } = ab2;
 let { abi } = ab;
 const SellPage = ({ id }) => {
-  
+  const router = useRouter();
   console.log(id);
+
   let { address, isConnecting, isDisconnected } = useAccount();
-  const [confirmation, setConfirmation] = useState(null);
   const [success, setSuccess] = useState(false);
-  const [checkValue, setCheckValue] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [modalShow, setModalShow] = useState(false);
   const { active, setActive } = useAppContext();
@@ -64,9 +64,9 @@ const SellPage = ({ id }) => {
     onSettled(data, error) {
       console.log("Settled", { data, error });
       if (error) {
-  console.log("errord")
+        console.log("errord");
         setTimeout(function () {
-          setErrorMessage(error)
+          setErrorMessage(error);
           setCloseModals(false);
         }, 2000);
       }
@@ -85,7 +85,7 @@ const SellPage = ({ id }) => {
     onSettled(data, error) {
       console.log("Settled", { data, error });
       if (data) {
-    sellHandler()
+        sellHandler();
       }
       if (error) {
         // console.warn("Dsata")
@@ -124,11 +124,15 @@ const SellPage = ({ id }) => {
       // let token = getCurrentToken()
       // console.log(token)
       console.log(data);
-    
+
       if (data?.status == 1) {
         apiCall();
         setSuccess(true);
         console.log("api");
+        setTimeout(function () {
+          setModalShow(false);
+          router.push("/collection/"+ address+"/" +id);
+        }, 2000);
       }
       if (data?.status == 0) {
         setErrorMessage(error?.message);
@@ -137,6 +141,7 @@ const SellPage = ({ id }) => {
           setModalShow(false);
         }, 2000);
       }
+
       if (error) {
         setErrorMessage(
           "An error has occurred please check etherscan for full details."
@@ -164,12 +169,11 @@ const SellPage = ({ id }) => {
     let price = priceRef.current.value;
     let quantity = quantityRef.current.value;
 
-    
     if (isApproved.data) {
-    sellHandler()
+      sellHandler();
       return;
     }
-          await signMessage.signMessage();
+    await signMessage.signMessage();
   }
 
   async function sellHandler(e) {
@@ -205,8 +209,8 @@ const SellPage = ({ id }) => {
       price,
       dataa.nftContent.commision
     );
-  let priced =   ethers.utils.parseEther( price) 
-console.log(priced,"dddddddddd")
+    let priced = ethers.utils.parseEther(price);
+    console.log(priced, "dddddddddd");
     write({
       args: [
         dataa.nftContent.nftIndex,
@@ -216,44 +220,39 @@ console.log(priced,"dddddddddd")
       ],
       overrides: {
         gasLimit: 3802558,
-      }})
-
-
+      },
+    });
 
     setCloseModals(true);
-    formRef.current.reset();
+    // formRef.current.reset();
   }
 
   useEffect(() => {
     nftData();
   }, []);
-async function apiCall() {
-  let price = priceRef.current.value;
-  let endDat = new Date(value[1]).toISOString().split("T")[0];
-  let quantity = quantityRef.current.value;
-  let startDat = new Date(value[0]).toISOString().split("T")[0];
+  async function apiCall() {
+    let price = priceRef.current.value;
+    let endDat = new Date(value[1]).toISOString().split("T")[0];
+    let quantity = quantityRef.current.value;
+    let startDat = new Date(value[0]).toISOString().split("T")[0];
 
-  let dateEnd = endDat.split("-");
-  let dateStart = startDat.split("-");
+    let dateEnd = endDat.split("-");
+    let dateStart = startDat.split("-");
 
-  let endDate = dateEnd[0] + dateEnd[1] + dateEnd[2];
-  let startDate = dateStart[0] + dateStart[1] + dateStart[2];
-  let dat = {
-    tokenId:    dataa.nftContent.nftIndex,
-    userAddress: address,
-    auctionType: 1,
-    startDate: startDat,
-    endDate: endDat,
-    minAmount: price,
-    quantity: quantity
-  };
-  setSuccess(true);
-  const response = await axios.post(
-    "/api/nftpage/auction/startauction",
-    dat
-  );
-
-}
+    let endDate = dateEnd[0] + dateEnd[1] + dateEnd[2];
+    let startDate = dateStart[0] + dateStart[1] + dateStart[2];
+    let dat = {
+      tokenId: dataa.nftContent.nftIndex,
+      userAddress: address,
+      auctionType: 1,
+      startDate: startDat,
+      endDate: endDat,
+      minAmount: price,
+      quantity: quantity,
+    };
+    setSuccess(true);
+    const response = await axios.post("/api/nftpage/auction/startauction", dat);
+  }
   // if (dataa === null) {
   //   return <div className="container">Loading...</div>;
   // }
@@ -280,7 +279,7 @@ async function apiCall() {
               overflow: "auto",
               width: "50%",
               padding: "2rem",
-            }}  
+            }}
           >
             <Form
               onSubmit={approval}

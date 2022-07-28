@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import ImgIcon from "../../public/img-icon.svg";
 import Exclamation from "../../public/exclamation.png";
 import ThreeLines from "../../public/three-lines.PNG";
@@ -6,7 +6,7 @@ import { Tooltip } from "@mui/material";
 import { Spinner } from "react-bootstrap";
 import IconButton from "@material-ui/core/IconButton";
 import axios from "axios";
-import {  TextField } from "@material-ui/core";
+import { TextField } from "@material-ui/core";
 import dynamic from "next/dynamic";
 const ReactPlayer = dynamic(() => import("react-player/lazy"), { ssr: false });
 
@@ -23,7 +23,7 @@ import {
 } from "wagmi";
 import ab from "../../public/abi/DaFactory.json";
 
-const { abi } = ab;
+const { abi2 } = ab;
 /* Create an instance of the client */
 
 const CreateNFT = () => {
@@ -34,7 +34,7 @@ const CreateNFT = () => {
   const descriptionRef = useRef(null);
   const commisionRef = useRef(null);
   const supplyRef = useRef(null);
-
+  const [nftCollection, setNftCollection] = useState(null);
   const [fieldsCount, setFieldsCount] = useState(1);
   const [modalShow, setModalShow] = useState(false);
   const [collectionName, setCollectionName] = useState(null);
@@ -64,10 +64,9 @@ const CreateNFT = () => {
   console.log(address);
   const { data, isError, isLoading, write } = useContractWrite({
     addressOrName: "0x162bA189fCfA19207BCcCDf454C7D3d9Da022cdC",
-    contractInterface: abi,
+    contractInterface: abi2,
     functionName: "mint",
 
-    args: [],
     onSettled(data, error) {
       console.log("Settled", { data, error });
       if (error) {
@@ -115,19 +114,15 @@ const CreateNFT = () => {
   });
   const token = useContractRead({
     addressOrName: "0x162bA189fCfA19207BCcCDf454C7D3d9Da022cdC",
-    contractInterface: abi,
+    contractInterface: abi2,
     functionName: "tokenIndex",
   });
-
-  // console.log(ethers.utils.BigNumber.from(0x1b))
-
   function handleChange(index, event) {
     console.log(index, event.target.value);
     const value = [...inputFields];
     value[index][event.target.name] = event.target.value;
     setInputFields(value);
   }
-
   function handleAddFields() {
     setInputFields([...inputFields, { trait_type: "", value: "" }]);
     setFieldsCount(fieldsCount + 1);
@@ -142,12 +137,7 @@ const CreateNFT = () => {
     setInputFields(value);
     setFieldsCount(fieldsCount - 1);
   }
-  ////
   const [uploading, setUploading] = useState(false);
-
-  function onDecrement() {
-    setPropertiesBox(propertiesBox.slice(0, -1));
-  }
 
   async function onChange(e) {
     e.preventDefault();
@@ -174,14 +164,7 @@ const CreateNFT = () => {
 
     console.log(URL.createObjectURL(file));
   }
-  async function UploadFile(file) {
-    // e.preventDefault();
-    console.log(file.type.split("/"));
-    const client = create("https://ipfs.infura.io:5001/api/v0");
-    const added = await client.add(file);
-    const url = `https://ipfs.infura.io/ipfs/${added.path}`;
-    return url;
-  }
+
   async function onChange2(e) {
     const file = e.target.files[0];
     if (typeof file == "undefined") return;
@@ -198,6 +181,14 @@ const CreateNFT = () => {
     setUploading2(false);
 
     // console.log(URL.createObjectURL(file));
+  }
+  async function UploadFile(file) {
+    // e.preventDefault();
+    console.log(file.type.split("/"));
+    const client = create("https://ipfs.infura.io:5001/api/v0");
+    const added = await client.add(file);
+    const url = `https://ipfs.infura.io/ipfs/${added.path}`;
+    return url;
   }
 
   async function onChange3(e) {
@@ -227,7 +218,7 @@ const CreateNFT = () => {
     if (fileUrl == null) return;
     let supply = supplyRef.current?.value;
     setModalShow(true);
-
+    console.log(address, parseInt(supply));
     write({
       args: [address, parseInt(supply)],
       overrides: {},
@@ -278,6 +269,7 @@ const CreateNFT = () => {
       commision: commision,
       externalLink: externalLink,
       propertyArray: inputFields,
+      nftCollection: nftCollection, 
     };
     console.log(data);
     console.log(data);
@@ -287,16 +279,22 @@ const CreateNFT = () => {
       window.location.href = "/assets/" + address;
     }, 8000);
   }
+  const [collection, setCollections] = useState(null);
+  async function getCollection() {
+    console.log("api");
+    try {
+      let res = await axios.post("/api/getallcollection");
 
-  // function onCollection(){
-  //   setErrorMessage(null)
-  //   setTransHash(null)
-  //   setConfirmation(false)
-  //   setSuccess(false)
-  //   setContractAddress(null)
-  //   setModalShow(true)
-  //   createCollection("DA",10,setModalShow,setTransHash,setConfirmation,setSuccess,setContractAddress,setErrorMessage)
-  // }
+      let data = res.data;
+      console.log(data, "dataaa");
+      setCollections(data.data);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+  useEffect(() => {
+    getCollection();
+  }, []);
   return (
     <div>
       <div className="create-header">
@@ -701,36 +699,62 @@ const CreateNFT = () => {
                   </div>
 
                   <div className="form-ipt-sec">
-                    <h4 className="name-txt">Commision</h4>
-                    <p className="para-txt">
-                      {" "}
-                      The number of items that can be minted. No gas cost to
-                      you!
-                      <Tooltip
-                        title={
-                          "Minting is an action that brings an item into existence on the blockchain, and costs gas to do so."
-                        }
-                        placement="top-end"
-                        target="tooltip"
-                      >
-                        <img
-                          className="excllamation"
-                          src={Exclamation.src}
-                          height="18px"
-                          data-bs-toggle="tooltip"
-                          data-bs-placement="top"
-                        />
-                      </Tooltip>
-                    </p>
+                    <div className="form-ipt-sec">
+                      <h4 className="name-txt">Creator Earnings</h4>
+                      <p className="para-txt">
+                        Collect a fee when a user re-sells an item you
+                        originally created. This is deducted from the final sale
+                        price and paid monthly to a payout address of your
+                        choosing.{" "}
+                        <a href="">Learn more about creator earnings.</a>
+                      </p>
+                      <h5 className="per-txt">Percentage fee</h5>
+                      <input
+                        ref={commisionRef}
+                        type="text"
+                        className="form-ipt"
+                        placeholder="1"
+                        required
+                      />
+                    </div>
+                  </div>
 
-                    <input
+                  <div className="form-ipt-sec">
+                    <div className="form-ipt-sec">
+                      <h4 className="name-txt">Select Collection</h4>
+                      <p className="para-txt">
+                        You can select a specific collection for your nft to
+                        appear in.
+                        {/* <a href="">Learn more about creator earnings.</a> */}
+                      </p>
+                      {/* <h5 className="per-txt">Percentage fee</h5> */}
+                      <select
+                        onChange={(e) =>
+                          setNftCollection(e.currentTarget.value)
+                        }
+                        className="form-ipt"
+                      >
+                        <option value="" className="form-ipt">
+                          None
+                        </option>
+                        {collection
+                          ? collection.map((item) => (
+                              <option value={item.id} className="form-ipt">
+                                {item.name}
+                              </option>
+                            ))
+                          : ""}
+                      </select>
+                      {/* <input
                       ref={commisionRef}
                       type="text"
                       className="form-ipt"
                       placeholder="1"
                       required
-                    />
+                      /> */}
+                    </div>
                   </div>
+
                   <div className="form-ipt-sec">
                     <h4 className="name-txt">Free for All</h4>
                     <p className="para-txt">

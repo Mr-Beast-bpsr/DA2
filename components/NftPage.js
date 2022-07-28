@@ -18,6 +18,7 @@ import Modal from "react-bootstrap/Modal";
 import Modaal from "./ui/Modaal.js";
 import ab from "../public/abi/DaAuction.json";
 import CreateNftModal from "./ui/TransModal";
+import { utils } from "ethers";
 let { abi } = ab;
 
 const NftPage = ({ props }) => {
@@ -31,6 +32,7 @@ const NftPage = ({ props }) => {
   const [auction, setAuction] = useState(props.auctionData);
   const [nftContent, setNftContent] = useState(props.data.nftContent);
   const [nftTraits, setNftTraits] = useState(props.data.traits);
+  console.log(auction);
   const router = useRouter();
   // console.log(nftContent);
   const [activity, setActivity] = useState(null);
@@ -59,11 +61,12 @@ const NftPage = ({ props }) => {
     setCloseModal(true);
     setErrorMessage(null);
     setTransHash(null);
-
+    console.log(auction);
     buyNft.write({
       args: [auction.id],
       overrides: {
         gasLimit: 3302558,
+        value: utils.parseEther(auction?.minAmount.toString()),
       },
     });
   }
@@ -84,7 +87,7 @@ const NftPage = ({ props }) => {
     let data = { id: auction?.id, amount: auction?.minAmount };
     let res = await axios.post("/api/nftpage/auction/closebid", data);
     console.log(res.data.data);
-    location.reload()
+    location.reload();
   }
 
   async function apiCalla() {
@@ -94,6 +97,7 @@ const NftPage = ({ props }) => {
       userAddress: data?.address,
       holdings: 1,
       amount: auction.minAmount,
+      nftOwner: auction.userAddress,
     };
     console.warn(data, "data");
     let bid = await axios.post("/api/nftpage/auction/placebidonauction", dat);
@@ -293,8 +297,7 @@ const NftPage = ({ props }) => {
     onSettled(data, error) {
       setSuccess(true);
       console.log("Settled Wait", { data, error });
-      // let token = getCurrentToken()
-      // console.log(token)
+
       console.log(data);
 
       if (data?.status == 1) {
@@ -326,8 +329,7 @@ const NftPage = ({ props }) => {
     onSettled(data, error) {
       setSuccess(true);
       console.log("Settled Wait", { data, error });
-      // let token = getCurrentToken()
-      // console.log(token)
+
       console.log(data);
 
       if (data?.status == 1) {
@@ -353,6 +355,18 @@ const NftPage = ({ props }) => {
       }
     },
   });
+  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+  const config = {
+    file: {
+      forceHLS: !isSafari,
+      forceVideo: true,
+      hlsVersion: "0.12.4",
+      attributes: {
+        // poster: feed && feed.actionUrl && feed.actionUrl.image,
+        disablePictureInPicture: true,
+      },
+    },
+  };
   return (
     <div className="page-header">
       <Modaal
@@ -413,8 +427,8 @@ const NftPage = ({ props }) => {
                   />
                 ) : (
                   <ReactPlayer
-                    playinline={true}
-                    pip={true}
+                    playsinline={true}
+                    // pip={true}
                     playing={true}
                     className="Da-Player"
                     url={nftContent.nftImage}
@@ -423,6 +437,7 @@ const NftPage = ({ props }) => {
                     muted={true}
                     width="100%"
                     controls={true}
+                    config={config}
                   />
                 )}
               </div>
@@ -709,9 +724,7 @@ const NftPage = ({ props }) => {
                               <th scope="col">Event</th>
                               <th scope="col">Price</th>
                               {/* <th scope="col">From</th>  */}
-                              <th scope="col" className="table-txt">
-                                To
-                              </th>
+                              <th scope="col">To</th>
                               <th scope="col">Date</th>
                             </tr>
 
@@ -725,7 +738,18 @@ const NftPage = ({ props }) => {
                                     </td>
                                     <td className="tld">{act.amount}</td>
                                     <td style={{ overflowWrap: "anywhere" }}>
-                                      {act.to}
+                                      <a
+                                        href={
+                                          "https://mumbai.polygonscan.com/address/" +
+                                          act?.to
+                                        }
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        style={{ textDecoration: "none" }}
+                                      >
+                                        {act?.to.slice(0, 5)} ....
+                                        {act?.to.slice(11, 16)}
+                                      </a>
                                     </td>
 
                                     <td>
