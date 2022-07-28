@@ -448,9 +448,11 @@ const NftPage = ({ props }) => {
                       width="100%"
                       playsinline
                       height="100%"
-                      src={nftContent.nftImage}
+                      // src={nftContent.nftImage}
                       type="video/mp4"
-                    ></video>
+                    >
+                      <source src={nftContent.nftImage} />
+                    </video>
                   </>
                 )}
               </div>
