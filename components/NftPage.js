@@ -448,6 +448,21 @@ const NftPage = ({ props }) => {
                       src={nftContent.nftImage}
                       type="video/mp4"
                     />
+
+                    <video
+                      width="800"
+                      height="640"
+                      loop
+                      muted
+                      controls="true"
+
+                      playsinline
+
+                    >
+                      <source src={nftContent.nftImage} type="video/mp4" />
+                      {/* <source src="xmasvideo/M&P-Xmas 2.ogv" type="video/ogv" /> */}
+                      <source type="video/webm" src="xmasvideo/M&P-Xmas.webm" />
+                    </video>
                   </>
                 )}
               </div>
