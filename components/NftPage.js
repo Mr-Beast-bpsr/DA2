@@ -355,7 +355,7 @@ const NftPage = ({ props }) => {
       }
     },
   });
-  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+  const isSafari = /^((?!chrome|android).)*safari/;
   const config = {
     file: {
       forceHLS: !isSafari,
@@ -747,8 +747,8 @@ const NftPage = ({ props }) => {
                                         rel="noreferrer"
                                         style={{ textDecoration: "none" }}
                                       >
-                                        {act?.to.slice(0, 5)} ....
-                                        {act?.to.slice(11, 16)}
+                                        {act?.to?.slice(0, 5)} ....
+                                        {act?.to?.slice(11, 16)}
                                       </a>
                                     </td>
 
