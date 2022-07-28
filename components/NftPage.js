@@ -445,6 +445,7 @@ const NftPage = ({ props }) => {
                       autoplay
                       controls="true"
                       width="100%"
+                      playsinline
                       height="100%"
                       src={nftContent.nftImage}
                       type="video/mp4"
