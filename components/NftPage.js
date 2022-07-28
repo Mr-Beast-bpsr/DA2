@@ -443,6 +443,7 @@ const NftPage = ({ props }) => {
                     <video
                       loop
                       autoplay
+                      muted
                       controls="true"
                       width="100%"
                       playsinline
