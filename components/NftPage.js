@@ -428,31 +428,26 @@ const NftPage = ({ props }) => {
                 ) : (
                   <>
                     <ReactPlayer
-                      playsinline={true}
-                      // pip={true}
-                      playing={true}
+                      playsinline
+                      // playing={true}
                       className="Da-Player"
                       url={nftContent.nftImage}
                       type="video/mp4"
                       height="200%"
                       muted={true}
                       width="100%"
-                      controls={true}
-                      config={config}
+                      controls="true"
                     />
                     <video
                       loop
-                      autoplay
                       muted
                       controls="true"
                       width="100%"
                       playsinline
                       height="100%"
-                      // src={nftContent.nftImage}
+                      src={nftContent.nftImage}
                       type="video/mp4"
-                    >
-                      <source src={nftContent.nftImage} />
-                    </video>
+                    />
                   </>
                 )}
               </div>
