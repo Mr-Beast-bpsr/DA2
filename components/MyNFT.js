@@ -150,7 +150,7 @@ const NftPage = ({ props }) => {
                     {result
                       ? result.map((item, index) => {
                           return (
-                            <Link key={index}    href={{query: { address: router.query.uid } , pathname:"/Collections/" + item.id}}>
+                            <Link key={index}    href={{query: { address: router.query.uid } , pathname:"/Collection/" + item.id}}>
                               <div className="card-sec">
                                 {/* <a href="/nfts"> */}
                                 <img

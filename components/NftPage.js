@@ -428,6 +428,7 @@ const NftPage = ({ props }) => {
                 ) : (
                   <>
                     <ReactPlayer
+                      style={{ position: "absolute" }}
                       playsinline
                       // playing={true}
                       className="Da-Player"
@@ -439,12 +440,14 @@ const NftPage = ({ props }) => {
                       controls="true"
                     />
                     <video
-                      loop
+                      playsinline
+                      autoPlay
                       muted
                       controls="true"
                       width="100%"
-                      playsinline
                       height="100%"
+                      style={{ position: "absolute", backgroundColor: "black"}}
+
                       src={nftContent.nftImage}
                       type="video/mp4"
                     />
@@ -455,9 +458,8 @@ const NftPage = ({ props }) => {
                       loop
                       muted
                       controls="true"
-
+                      style={{ position: "absolute" }}
                       playsinline
-
                     >
                       <source src={nftContent.nftImage} type="video/mp4" />
                       {/* <source src="xmasvideo/M&P-Xmas 2.ogv" type="video/ogv" /> */}

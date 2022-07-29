@@ -131,7 +131,7 @@ const HomeMap = (props) => {
             return (
               <Link
                 href={{
-                  pathname: "/Collections/" + uri.id,
+                  pathname: "/Collection/" + uri.id,
                   query: { address: address},
                 }}
                 key={i}
