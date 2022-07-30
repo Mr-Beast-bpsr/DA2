@@ -167,7 +167,6 @@ const NftPage = ({ props }) => {
     }
   }
 
-
   function notALoop(distance) {
     // if (auction){
     if (days <= 0 && hours <= 0 && minutes <= 0 && seconds <= 0) {
@@ -409,7 +408,7 @@ const NftPage = ({ props }) => {
                       width="100%"
                       controls="true"
                     /> */}
-                    <video
+                    {/* <video
                       playsInLine
                       autoPlay
                       muted
@@ -419,13 +418,14 @@ const NftPage = ({ props }) => {
                       style={{ position: "absolute", backgroundColor: "black" }}
                       src={nftContent.nftImage}
                       type="video/mp4"
-                    />
+                    /> */}
 
                     <video
                       width="800"
                       height="640"
                       loop
                       muted
+                      playsInLine
                       controls="true"
                       style={{ position: "absolute" }}
                       playsinline
