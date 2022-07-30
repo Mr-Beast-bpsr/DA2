@@ -120,9 +120,9 @@ const NftPage = ({ props }) => {
       setEnded(true);
     }
     apiCall();
-    const res = axios.post("http://52.9.60.249:4000/api/v1/nft/saveview", {
-      tokenId: nftContent.nftId,
-    });
+    // const res = axios.post("http://52.9.60.249:4000/api/v1/nft/saveview", {
+    //   tokenId: nftContent.nftId,
+    // });
   }, []);
   // function onPlaceBid() {}
 
@@ -443,14 +443,14 @@ const NftPage = ({ props }) => {
                       />
                     </video> */}
                     <video
-                      autoplay=""
+                      autoPlay={true}
                       className="AssetMedia--video Da-Player"
                       controls={true}
-                      controlslist="nodownload"
+                      controlsList="nodownload"
                       loop={true}
                       width="100%"
                       height="100%"
-                      playsInLine={true}
+                      playsInline={true}
                       poster=""
                       preload="metadata"
                       // style="border-radius: initial;"
