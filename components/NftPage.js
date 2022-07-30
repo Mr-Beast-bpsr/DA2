@@ -438,7 +438,7 @@ const NftPage = ({ props }) => {
                     >
                       <source
                         data-testid="AssetMedia--video"
-                        src={nftContent?.nftImage}
+                        src="https://openseauserdata.com/files/0f6e2817ac812dc5aeea6d7f57038d13.mp4#t=0.001"
                         type="video/mp4"
                       />
                     </video>
