@@ -421,19 +421,41 @@ const NftPage = ({ props }) => {
                     /> */}
 
                     <video
-                      autoplay=""
-                      class="AssetMedia--video"
+                      autoplay={true}
+                      className="Da-Player AssetMedia--video"
+                      // class="/"
                       controls={true}
                       controlslist="nodownload"
-                      loop=""
-                      playsinline=""
+                      loop={true}
+                      playsinline
                       poster={nftContent?.nftFeaturedImage}
                       preload="metadata"
-                      style={{
-                        borderRadius: "initial",
-                        width: "800px",
-                        height: "500px",
-                      }}
+                      // style={{
+                      //   borderRadius: "initial",
+                      //   width: "800px",
+                      //   height: "500px",
+                      // }}
+                    >
+                      <source
+                        data-testid="AssetMedia--video"
+                        src={nftContent?.nftImage}
+                        type="video/mp4"
+                      />
+                    </video>
+                    <video
+                      autoplay={true}
+                      className="Da-Player AssetMedia--video"
+                      controls={true}
+                      controlslist="nodownload"
+                      loop={true}
+                      playsInLine
+                      poster={nftContent?.nftFeaturedImage}
+                      preload="metadata"
+                      // style={{
+                      //   borderRadius: "initial",
+                      //   width: "800px",
+                      //   height: "500px",
+                      // }}
                     >
                       <source
                         data-testid="AssetMedia--video"
@@ -446,6 +468,7 @@ const NftPage = ({ props }) => {
                       loop
                       muted
                       playsInLine
+                      className="Da player"
                       controls="true"
                       // style={{ position: "absolute" }}
                       playsinline
@@ -786,30 +809,8 @@ const NftPage = ({ props }) => {
                       </Accordion.Body>
                     </Accordion.Item>
                   </Accordion>
-                
                 </div>
               </div>
-              <video
-                    autoplay=""
-                    class="AssetMedia--video"
-                    controls=""
-                    controlslist="nodownload"
-                    loop=""
-                    playsInLine
-                    poster={nftContent?.nftFeaturedImage}
-                    preload="metadata"
-                    style={{
-                      borderRadius: "initial",
-                      width: "500px",
-                      height: "800px",
-                    }}
-                  >
-                    <source
-                      data-testid="AssetMedia--video"
-                      src={nftContent?.nftImage}
-                      type="video/mp4"
-                    />
-                  </video>
             </section>
           </div>
         </div>
