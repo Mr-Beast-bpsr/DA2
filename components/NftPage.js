@@ -444,14 +444,14 @@ const NftPage = ({ props }) => {
                     </video>
                     <video
                       autoplay=""
-                      class="AssetMedia--video"
+                      className="AssetMedia--video Da-Player"
                       controls={true}
                       controlslist="nodownload"
                       loop=""
                       playsinline=""
                       poster="https://lh3.googleusercontent.com/m2sZJWAurnJkfBuK2reqkZeH3q28u_GHY7lAxD_0cy2nzj2v7LtHjD-_tAyO2eNOqCrJHYYMoPpXj8ZYrhdtLK3sdm8ILmJkCdvr"
                       preload="metadata"
-                      style="border-radius: initial;"
+                      // style="border-radius: initial;"
                     >
                       <source
                         data-testid="AssetMedia--video"
