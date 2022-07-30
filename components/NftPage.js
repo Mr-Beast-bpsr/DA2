@@ -50,6 +50,7 @@ const NftPage = ({ props }) => {
   const [minutes, setMinutes] = useState(null);
   const [seconds, setSeconds] = useState(null);
   const [distance, setDistance] = useState(2);
+  const auctionContract = "0x103bA20233C93Aa753aC194D376bfF978790DA92";
 
   function onBack() {
     router.back();
@@ -166,37 +167,6 @@ const NftPage = ({ props }) => {
     }
   }
 
-  // async function addToPlayList(e) {
-  //   e.preventDefault();
-  //   if (data?.address) {
-  //     console.log(nftContent.id);
-  //     let add = await axios.post("/api/music/playlist/addToPlayList", {
-  //       id: nftContent.id,
-  //       userAddress: data?.address,
-  //     });
-  //     console.log("ad");
-  //     toast.success("Added to playlist", {
-  //       position: "top-right",
-  //       autoClose: 5000,
-  //       hideProgressBar: false,
-  //       closeOnClick: true,
-  //       pauseOnHover: true,
-  //       draggable: true,
-  //       progress: undefined,
-  //     });
-  //     setInPlaylist(true);
-  //     return;
-  //   }
-  //   toast.error("Please Connect wallet!", {
-  //     position: "top-right",
-  //     autoClose: 5000,
-  //     hideProgressBar: false,
-  //     closeOnClick: true,
-  //     pauseOnHover: true,
-  //     draggable: true,
-  //     progress: undefined,
-  //   });
-  // }
 
   function notALoop(distance) {
     // if (auction){
@@ -247,7 +217,7 @@ const NftPage = ({ props }) => {
   }, [auction, distance]);
 
   const buyNft = useContractWrite({
-    addressOrName: "0xF2F15FEf19077661E3cFc4Aa488Fa5F53E205D5b",
+    addressOrName: auctionContract,
     contractInterface: abi,
     functionName: "buyNFT",
 
@@ -270,7 +240,7 @@ const NftPage = ({ props }) => {
   });
 
   const stopSale = useContractWrite({
-    addressOrName: "0xF2F15FEf19077661E3cFc4Aa488Fa5F53E205D5b",
+    addressOrName: auctionContract,
     contractInterface: abi,
     functionName: "stopSale",
 
@@ -427,7 +397,7 @@ const NftPage = ({ props }) => {
                   />
                 ) : (
                   <>
-                    <ReactPlayer
+                    {/* <ReactPlayer
                       style={{ position: "absolute" }}
                       playsinline
                       // playing={true}
@@ -438,16 +408,15 @@ const NftPage = ({ props }) => {
                       muted={true}
                       width="100%"
                       controls="true"
-                    />
+                    /> */}
                     <video
-                      playsinline
+                      playsInLine
                       autoPlay
                       muted
                       controls="true"
                       width="100%"
                       height="100%"
-                      style={{ position: "absolute", backgroundColor: "black"}}
-
+                      style={{ position: "absolute", backgroundColor: "black" }}
                       src={nftContent.nftImage}
                       type="video/mp4"
                     />

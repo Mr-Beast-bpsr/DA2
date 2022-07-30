@@ -59,11 +59,13 @@ const CreateNFT = () => {
       value: "",
     },
   ]);
+  // const auctionContract = "0x103bA20233C93Aa753aC194D376bfF978790DA92";
+  const mintContract ='0xC933Da788A96e3DedCb229e2594c3fB376FfCd91'
 
   const { address } = useAccount();
   console.log(address);
   const { data, isError, isLoading, write } = useContractWrite({
-    addressOrName: "0x162bA189fCfA19207BCcCDf454C7D3d9Da022cdC",
+    addressOrName: mintContract,
     contractInterface: abi2,
     functionName: "mint",
 
@@ -113,7 +115,7 @@ const CreateNFT = () => {
     },
   });
   const token = useContractRead({
-    addressOrName: "0x162bA189fCfA19207BCcCDf454C7D3d9Da022cdC",
+    addressOrName: mintContract,
     contractInterface: abi2,
     functionName: "tokenIndex",
   });

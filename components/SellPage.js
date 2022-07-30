@@ -44,7 +44,8 @@ const SellPage = ({ id }) => {
 
   const formRef = useRef();
   const [transHash, setTransHash] = useState(null);
-
+  const auctionContract = "0x103bA20233C93Aa753aC194D376bfF978790DA92";
+  const mintContract ='0xC933Da788A96e3DedCb229e2594c3fB376FfCd91'
   async function nftData() {
     data = {
       id: id.id,
@@ -56,7 +57,7 @@ const SellPage = ({ id }) => {
   }
 
   const { data, isError, isLoading, write } = useContractWrite({
-    addressOrName: "0xF2F15FEf19077661E3cFc4Aa488Fa5F53E205D5b",
+    addressOrName: auctionContract,
     contractInterface: abi,
     functionName: "listNft",
 
@@ -77,11 +78,11 @@ const SellPage = ({ id }) => {
     },
   });
   const approve = useContractWrite({
-    addressOrName: "0x162bA189fCfA19207BCcCDf454C7D3d9Da022cdC",
+    addressOrName: mintContract,
     contractInterface: abi2,
     functionName: "CustomApprovalForAll",
 
-    args: ["0xF2F15FEf19077661E3cFc4Aa488Fa5F53E205D5b", 1],
+    args: [auctionContract, 1],
     onSettled(data, error) {
       console.log("Settled", { data, error });
       if (data) {
@@ -154,10 +155,10 @@ const SellPage = ({ id }) => {
     },
   });
   const isApproved = useContractRead({
-    addressOrName: "0x162bA189fCfA19207BCcCDf454C7D3d9Da022cdC",
+    addressOrName: mintContract,
     contractInterface: abi2,
     functionName: "isApprovedForAll",
-    args: [address, "0xF2F15FEf19077661E3cFc4Aa488Fa5F53E205D5b"],
+    args: [address, auctionContract],
   });
 
   async function approval(e) {

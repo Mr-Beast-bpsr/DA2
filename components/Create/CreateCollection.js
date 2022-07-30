@@ -7,11 +7,13 @@ import Telegram from "../../public/telegram.svg";
 import Web from "../../public/web.svg";
 import axios from "axios";
 import { create } from "ipfs-http-client";
+import { Alert } from "react-bootstrap";
 
 const CreateCollection = () => {
   const nameRef = useRef(null);
   const urlRef = useRef(null);
   const descriptionRef = useRef(null);
+  const [success, setSuccess] = useState(false);
   const yoursiteRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState({
@@ -19,6 +21,7 @@ const CreateCollection = () => {
     featured: false,
     banner: false,
   });
+  console.log(loading)
   const [fileData, setData] = useState({
     logoImage: "",
     featuredImage: "",
@@ -104,11 +107,16 @@ const CreateCollection = () => {
       setLoading(false);
       return;
     }
+try{
 
-    let send = await axios.post("/api/mintpage/collection", fileData);
-    console.log(send.data);
-    console.log(fileData, "file");
-    setLoading(false);
+  let send = await axios.post("/api/mintpage/collection", fileData);
+  console.log(send.data);
+  console.log(fileData, "file");
+  setLoading(false);
+  setSuccess(true);
+}catch(e){
+console.log(e)
+}
   }
 
   return (
@@ -346,7 +354,7 @@ const CreateCollection = () => {
                           className="form-selected bg-light border-0"
                           style={{ borderRadius: " 0 0  7px 0" }}
                           placeholder="https://t.me/abcdef"
-                        />
+                          />
                       </div>
                     </div>
                   </div>
@@ -365,17 +373,28 @@ const CreateCollection = () => {
                       type="text"
                       className="form-ipt mt-3"
                       placeholder="e.g. 25"
-                    />
+                    />u
                   </div> */}
-
                   <div className="form-btn-sec">
-                    <button
-                      disabled={loading}
-                      type="submit"
-                      className="create-btn"
-                    >
-                      Create
-                    </button>
+              { success &&    <Alert variant="success">Your collection has been created successfully</Alert>}
+
+                    {loading == false ? (
+                      <button
+                        disabled={loading}
+                        type="submit"
+                        className="create-btn"
+                      >
+                        Create
+                      </button>
+                    ) : (
+                      <button
+                        disabled={true}
+                        // type="submit"
+                        className="create-btn"
+                      >
+                        Loading...
+                      </button>
+                    )}
                   </div>
                 </form>
               </div>
