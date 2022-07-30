@@ -421,8 +421,24 @@ const NftPage = ({ props }) => {
                     /> */}
 
                     <video
-                      width="800"
-                      height="640"
+                      autoplay=""
+                      class="AssetMedia--video"
+                      controls=""
+                      controlslist="nodownload"
+                      loop=""
+                      playsinline=""
+                      poster={nftContent.nftFeaturedImage}
+                      preload="metadata"
+                      style="border-radius: initial;"
+                    >
+                      <source
+                        data-testid="AssetMedia--video"
+                        src={nftContent.nftImage}
+                        type="video/mp4"
+                      />
+                    </video>
+
+                    <video
                       loop
                       muted
                       playsInLine
@@ -766,6 +782,23 @@ const NftPage = ({ props }) => {
                       </Accordion.Body>
                     </Accordion.Item>
                   </Accordion>
+                  <video
+                    autoplay=""
+                    class="AssetMedia--video"
+                    controls=""
+                    controlslist="nodownload"
+                    loop=""
+                    playsInLine
+                    poster={nftContent.nftFeaturedImage}
+                    preload="metadata"
+                    style="border-radius: initial;"
+                  >
+                    <source
+                      data-testid="AssetMedia--video"
+                      src={nftContent.nftImage}
+                      type="video/mp4"
+                    />
+                  </video>
                 </div>
               </div>
             </section>
