@@ -423,17 +423,21 @@ const NftPage = ({ props }) => {
                     <video
                       autoplay=""
                       class="AssetMedia--video"
-                      controls=""
+                      controls={true}
                       controlslist="nodownload"
                       loop=""
                       playsinline=""
-                      poster={nftContent.nftFeaturedImage}
+                      poster={nftContent?.nftFeaturedImage}
                       preload="metadata"
-                      style="border-radius: initial;"
+                      style={{
+                        borderRadius: "initial",
+                        width: "800px",
+                        height: "500px",
+                      }}
                     >
                       <source
                         data-testid="AssetMedia--video"
-                        src={nftContent.nftImage}
+                        src={nftContent?.nftImage}
                         type="video/mp4"
                       />
                     </video>
@@ -443,7 +447,7 @@ const NftPage = ({ props }) => {
                       muted
                       playsInLine
                       controls="true"
-                      style={{ position: "absolute" }}
+                      // style={{ position: "absolute" }}
                       playsinline
                     >
                       <source src={nftContent.nftImage} type="video/mp4" />
@@ -782,25 +786,30 @@ const NftPage = ({ props }) => {
                       </Accordion.Body>
                     </Accordion.Item>
                   </Accordion>
-                  <video
+                
+                </div>
+              </div>
+              <video
                     autoplay=""
                     class="AssetMedia--video"
                     controls=""
                     controlslist="nodownload"
                     loop=""
                     playsInLine
-                    poster={nftContent.nftFeaturedImage}
+                    poster={nftContent?.nftFeaturedImage}
                     preload="metadata"
-                    style="border-radius: initial;"
+                    style={{
+                      borderRadius: "initial",
+                      width: "500px",
+                      height: "800px",
+                    }}
                   >
                     <source
                       data-testid="AssetMedia--video"
-                      src={nftContent.nftImage}
+                      src={nftContent?.nftImage}
                       type="video/mp4"
                     />
                   </video>
-                </div>
-              </div>
             </section>
           </div>
         </div>
