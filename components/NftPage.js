@@ -438,7 +438,7 @@ const NftPage = ({ props }) => {
                     >
                       <source
                         data-testid="AssetMedia--video"
-                        src="https://openseauserdata.com/files/0f6e2817ac812dc5aeea6d7f57038d13.mp4#t=0.001"
+                        src={nftContent?.nftImage}
                         type="video/mp4"
                       />
                     </video>
@@ -458,41 +458,6 @@ const NftPage = ({ props }) => {
                         src="https://openseauserdata.com/files/0f6e2817ac812dc5aeea6d7f57038d13.mp4#t=0.001"
                         type="video/mp4"
                       />
-                    </video>
-                    <video
-                      autoplay={true}
-                      className="Da-Player AssetMedia--video"
-                      controls={true}
-                      controlslist="nodownload"
-                      loop={true}
-                      playsInLine
-                      poster={nftContent?.nftFeaturedImage}
-                      preload="metadata"
-                      // style={{
-                      //   borderRadius: "initial",
-                      //   width: "800px",
-                      //   height: "500px",
-                      // }}
-                    >
-                      <source
-                        data-testid="AssetMedia--video"
-                        src={nftContent?.nftImage}
-                        type="video/mp4"
-                      />
-                    </video>
-
-                    <video
-                      loop
-                      muted
-                      playsInLine
-                      className="Da player"
-                      controls="true"
-                      // style={{ position: "absolute" }}
-                      playsinline
-                    >
-                      <source src={nftContent.nftImage} type="video/mp4" />
-                      {/* <source src="xmasvideo/M&P-Xmas 2.ogv" type="video/ogv" /> */}
-                      <source type="video/webm" src="xmasvideo/M&P-Xmas.webm" />
                     </video>
                   </>
                 )}
