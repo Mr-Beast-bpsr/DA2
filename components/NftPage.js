@@ -443,6 +443,23 @@ const NftPage = ({ props }) => {
                       />
                     </video>
                     <video
+                      autoplay=""
+                      class="AssetMedia--video"
+                      controls={true}
+                      controlslist="nodownload"
+                      loop=""
+                      playsinline=""
+                      poster="https://lh3.googleusercontent.com/m2sZJWAurnJkfBuK2reqkZeH3q28u_GHY7lAxD_0cy2nzj2v7LtHjD-_tAyO2eNOqCrJHYYMoPpXj8ZYrhdtLK3sdm8ILmJkCdvr"
+                      preload="metadata"
+                      style="border-radius: initial;"
+                    >
+                      <source
+                        data-testid="AssetMedia--video"
+                        src="https://openseauserdata.com/files/0f6e2817ac812dc5aeea6d7f57038d13.mp4#t=0.001"
+                        type="video/mp4"
+                      />
+                    </video>
+                    <video
                       autoplay={true}
                       className="Da-Player AssetMedia--video"
                       controls={true}
