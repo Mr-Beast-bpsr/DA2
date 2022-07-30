@@ -447,9 +447,11 @@ const NftPage = ({ props }) => {
                       className="AssetMedia--video Da-Player"
                       controls={true}
                       controlslist="nodownload"
-                      loop=""
-                      playsinline=""
-                      poster="https://lh3.googleusercontent.com/m2sZJWAurnJkfBuK2reqkZeH3q28u_GHY7lAxD_0cy2nzj2v7LtHjD-_tAyO2eNOqCrJHYYMoPpXj8ZYrhdtLK3sdm8ILmJkCdvr"
+                      loop={true}
+                      width="100%"
+                      height="100%"
+                      playsInLine={true}
+                      poster=""
                       preload="metadata"
                       // style="border-radius: initial;"
                     >
