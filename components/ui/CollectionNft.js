@@ -10,7 +10,7 @@ const CollectionNft = ({props}) => {
   
   const [totalURI, setTotalURI] = useState(props);
 const {address} =useAccount()
-console.log(props)
+// console.log(props)
 
   return (
     <>

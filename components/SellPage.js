@@ -45,7 +45,7 @@ const SellPage = ({ id }) => {
   const formRef = useRef();
   const [transHash, setTransHash] = useState(null);
   const auctionContract = "0x103bA20233C93Aa753aC194D376bfF978790DA92";
-  const mintContract ='0xC933Da788A96e3DedCb229e2594c3fB376FfCd91'
+  const mintContract = "0xC933Da788A96e3DedCb229e2594c3fB376FfCd91";
   async function nftData() {
     data = {
       id: id.id,
@@ -132,7 +132,7 @@ const SellPage = ({ id }) => {
         console.log("api");
         setTimeout(function () {
           setModalShow(false);
-          router.push("/collection/"+ address+"/" +id);
+          // router.push("/collection/"+ address+"/" +id);
         }, 2000);
       }
       if (data?.status == 0) {

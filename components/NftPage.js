@@ -23,7 +23,7 @@ let { abi } = ab;
 
 const NftPage = ({ props }) => {
   const [errorMessage, setErrorMessage] = useState(null);
-
+// console.log(props)
   const [modalShow, setModalShow] = React.useState(false);
 
   const [inPlaylist, setInPlaylist] = useState(props.viewData.inPlaylist);
@@ -50,13 +50,13 @@ const NftPage = ({ props }) => {
   const [minutes, setMinutes] = useState(null);
   const [seconds, setSeconds] = useState(null);
   const [distance, setDistance] = useState(2);
+  const [isOwner, setIsOwner] = useState(false);
   const auctionContract = "0x103bA20233C93Aa753aC194D376bfF978790DA92";
 
   function onBack() {
     router.back();
   }
 
-  // const notify = () => t
   async function publicSaleHandler(e) {
     e.preventDefault();
     setCloseModal(true);
@@ -109,7 +109,9 @@ const NftPage = ({ props }) => {
   useEffect(() => {
     let owner = localStorage.getItem("address");
     setSell(data?.address?.toLowerCase() == nftContent.nftOwner?.toLowerCase());
-
+    setIsOwner(
+      data?.address?.toLowerCase() == nftContent.nftOwner?.toLowerCase()
+    );
     setAddress(data?.address);
     console.log(
       data?.address?.toLowerCase() == nftContent.nftOwner?.toLowerCase()
@@ -134,16 +136,28 @@ const NftPage = ({ props }) => {
   useEffect(() => {
     apiCall2(auction);
   }, [auction]);
+  function checkOwner(data) {
+    return data.owner == data?.address;
+  }
   async function apiCall2() {
     const response2 = await axios.post("/api/nftpage/auction/getowners", {
       nftId: nftContent.nftId,
     });
+
     const data2 = await response2.data.data;
     console.log(data2, "Data!");
     setActivity(data2);
-    console.log(data2.data);
+    console.log(data2);
+    data2.map((item) =>{
+      if(item.toAddress == data?.address){
+setIsOwner(true)
+      }
+    })
+    // let st = data2.data.find(checkOwner);
+    // setIsOwner(st);
     console.log();
   }
+
   ////////////////////////////////////////////////
 
   ////////////////////////////////////////////////////////////
@@ -293,6 +307,7 @@ const NftPage = ({ props }) => {
     },
   });
 
+  // let ownerSet=((d)=>setIsOwner(true))76
   const waitForTransaction = useWaitForTransaction({
     hash: buyNft.data?.hash,
     onSettled(data, error) {
@@ -478,7 +493,7 @@ const NftPage = ({ props }) => {
               <div className="collect-top">
                 <div className="text-sec">
                   {/* <h6 className="collect-text"> Collection Name</h6> */}
-                  {nftContent.imageType != 0 && nftContent.freeForAll ? (
+                  {nftContent.imageType != 0 && nftContent.freeForAll  ==true ||  nftContent.imageType != 0 && isOwner == true? (
                     <Button
                       // onClick={addToPlayList}
                       style={{ width: "50%" }}
@@ -753,6 +768,10 @@ const NftPage = ({ props }) => {
 
                             {activity !== null ? (
                               activity?.map((act, i) => {
+                                if(act.toAddress == data?.address){
+                               
+                                }
+                                
                                 return (
                                   <tr key={i}>
                                     <td className="tld">
@@ -764,14 +783,14 @@ const NftPage = ({ props }) => {
                                       <a
                                         href={
                                           "https://mumbai.polygonscan.com/address/" +
-                                          act?.to
+                                          act?.toAddress
                                         }
                                         target="_blank"
                                         rel="noreferrer"
                                         style={{ textDecoration: "none" }}
                                       >
-                                        {act?.to?.slice(0, 5)} ....
-                                        {act?.to?.slice(11, 16)}
+                                        {act?.toAddress?.slice(0, 5)} ....
+                                        {act?.toAddress?.slice(11, 16)}
                                       </a>
                                     </td>
 

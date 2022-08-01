@@ -216,6 +216,7 @@ const CreateNFT = () => {
     setSuccess(false);
     setContractAddress(null);
     setModalShow(true);
+    console.log(freeCheck)
     // console.log(type)
     if (fileUrl == null) return;
     let supply = supplyRef.current?.value;
